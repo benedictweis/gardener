@@ -33,6 +33,8 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 	scheme.AddTypeDefaultingFunc(&CloudProfileList{}, func(obj interface{}) { SetObjectDefaults_CloudProfileList(obj.(*CloudProfileList)) })
 	scheme.AddTypeDefaultingFunc(&ControllerRegistration{}, func(obj interface{}) { SetObjectDefaults_ControllerRegistration(obj.(*ControllerRegistration)) })
 	scheme.AddTypeDefaultingFunc(&ControllerRegistrationList{}, func(obj interface{}) { SetObjectDefaults_ControllerRegistrationList(obj.(*ControllerRegistrationList)) })
+	scheme.AddTypeDefaultingFunc(&PrivateCloudProfile{}, func(obj interface{}) { SetObjectDefaults_PrivateCloudProfile(obj.(*PrivateCloudProfile)) })
+	scheme.AddTypeDefaultingFunc(&PrivateCloudProfileList{}, func(obj interface{}) { SetObjectDefaults_PrivateCloudProfileList(obj.(*PrivateCloudProfileList)) })
 	scheme.AddTypeDefaultingFunc(&Project{}, func(obj interface{}) { SetObjectDefaults_Project(obj.(*Project)) })
 	scheme.AddTypeDefaultingFunc(&ProjectList{}, func(obj interface{}) { SetObjectDefaults_ProjectList(obj.(*ProjectList)) })
 	scheme.AddTypeDefaultingFunc(&SecretBinding{}, func(obj interface{}) { SetObjectDefaults_SecretBinding(obj.(*SecretBinding)) })
@@ -87,6 +89,32 @@ func SetObjectDefaults_ControllerRegistrationList(in *ControllerRegistrationList
 	for i := range in.Items {
 		a := &in.Items[i]
 		SetObjectDefaults_ControllerRegistration(a)
+	}
+}
+
+func SetObjectDefaults_PrivateCloudProfile(in *PrivateCloudProfile) {
+	for i := range in.Spec.MachineImages {
+		a := &in.Spec.MachineImages[i]
+		SetDefaults_MachineImage(a)
+		for j := range a.Versions {
+			b := &a.Versions[j]
+			SetDefaults_MachineImageVersion(b)
+		}
+	}
+	for i := range in.Spec.MachineTypes {
+		a := &in.Spec.MachineTypes[i]
+		SetDefaults_MachineType(a)
+	}
+	for i := range in.Spec.VolumeTypes {
+		a := &in.Spec.VolumeTypes[i]
+		SetDefaults_VolumeType(a)
+	}
+}
+
+func SetObjectDefaults_PrivateCloudProfileList(in *PrivateCloudProfileList) {
+	for i := range in.Items {
+		a := &in.Items[i]
+		SetObjectDefaults_PrivateCloudProfile(a)
 	}
 }
 

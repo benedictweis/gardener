@@ -26,6 +26,8 @@ Resource Types:
 </li><li>
 <a href="#core.gardener.cloud/v1beta1.InternalSecret">InternalSecret</a>
 </li><li>
+<a href="#core.gardener.cloud/v1beta1.PrivateCloudProfile">PrivateCloudProfile</a>
+</li><li>
 <a href="#core.gardener.cloud/v1beta1.Project">Project</a>
 </li><li>
 <a href="#core.gardener.cloud/v1beta1.Quota">Quota</a>
@@ -922,6 +924,184 @@ Kubernetes core/v1.SecretType
 <em>(Optional)</em>
 <p>Used to facilitate programmatic handling of secret data.
 More info: <a href="https://kubernetes.io/docs/concepts/configuration/secret/#secret-types">https://kubernetes.io/docs/concepts/configuration/secret/#secret-types</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.gardener.cloud/v1beta1.PrivateCloudProfile">PrivateCloudProfile
+</h3>
+<p>
+<p>PrivateCloudProfile represents certain properties about a provider environment.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code></br>
+string</td>
+<td>
+<code>
+core.gardener.cloud/v1beta1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code></br>
+string
+</td>
+<td><code>PrivateCloudProfile</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code></br>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.27/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Standard object metadata.</p>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code></br>
+<em>
+<a href="#core.gardener.cloud/v1beta1.PrivateCloudProfileSpec">
+PrivateCloudProfileSpec
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Spec defines the provider environment properties.</p>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>caBundle</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>CABundle is a certificate bundle which will be installed onto every host machine of shoot cluster targeting this profile.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>kubernetes</code></br>
+<em>
+<a href="#core.gardener.cloud/v1beta1.KubernetesSettings">
+KubernetesSettings
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Kubernetes contains constraints regarding allowed values of the &lsquo;kubernetes&rsquo; block in the Shoot specification.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>machineImages</code></br>
+<em>
+<a href="#core.gardener.cloud/v1beta1.MachineImage">
+[]MachineImage
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>MachineImages contains constraints regarding allowed values for machine images in the Shoot specification.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>machineTypes</code></br>
+<em>
+<a href="#core.gardener.cloud/v1beta1.MachineType">
+[]MachineType
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>MachineTypes contains constraints regarding allowed values for machine types in the &lsquo;workers&rsquo; block in the Shoot specification.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>regions</code></br>
+<em>
+<a href="#core.gardener.cloud/v1beta1.Region">
+[]Region
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Regions contains constraints regarding allowed values for regions and zones.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>seedSelector</code></br>
+<em>
+<a href="#core.gardener.cloud/v1beta1.SeedSelector">
+SeedSelector
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>SeedSelector contains an optional list of labels on <code>Seed</code> resources that marks those seeds whose shoots may use this provider profile.
+An empty list means that all seeds of the same provider type are supported.
+This is useful for environments that are of the same type (like openstack) but may have different &ldquo;instances&rdquo;/landscapes.
+Optionally a list of possible providers can be added to enable cross-provider scheduling. By default, the provider
+type of the seed must match the shoot&rsquo;s provider.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>volumeTypes</code></br>
+<em>
+<a href="#core.gardener.cloud/v1beta1.VolumeType">
+[]VolumeType
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>VolumeTypes contains constraints regarding allowed values for volume types in the &lsquo;workers&rsquo; block in the Shoot specification.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>parent</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>A pointer to the PrivateCloudProfiles parent CloudProfile</p>
+</td>
+</tr>
+</table>
 </td>
 </tr>
 </tbody>
@@ -6504,7 +6684,8 @@ string
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#core.gardener.cloud/v1beta1.CloudProfileSpec">CloudProfileSpec</a>)
+<a href="#core.gardener.cloud/v1beta1.CloudProfileSpec">CloudProfileSpec</a>, 
+<a href="#core.gardener.cloud/v1beta1.PrivateCloudProfileSpec">PrivateCloudProfileSpec</a>)
 </p>
 <p>
 <p>KubernetesSettings contains constraints regarding allowed values of the &lsquo;kubernetes&rsquo; block in the Shoot specification.</p>
@@ -6922,7 +7103,8 @@ int32
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#core.gardener.cloud/v1beta1.CloudProfileSpec">CloudProfileSpec</a>)
+<a href="#core.gardener.cloud/v1beta1.CloudProfileSpec">CloudProfileSpec</a>, 
+<a href="#core.gardener.cloud/v1beta1.PrivateCloudProfileSpec">PrivateCloudProfileSpec</a>)
 </p>
 <p>
 <p>MachineImage defines the name and multiple versions of the machine image in any environment.</p>
@@ -7067,7 +7249,8 @@ Examples:
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#core.gardener.cloud/v1beta1.CloudProfileSpec">CloudProfileSpec</a>)
+<a href="#core.gardener.cloud/v1beta1.CloudProfileSpec">CloudProfileSpec</a>, 
+<a href="#core.gardener.cloud/v1beta1.PrivateCloudProfileSpec">PrivateCloudProfileSpec</a>)
 </p>
 <p>
 <p>MachineType contains certain properties of a machine type.</p>
@@ -7973,6 +8156,138 @@ string
 </tr>
 </tbody>
 </table>
+<h3 id="core.gardener.cloud/v1beta1.PrivateCloudProfileSpec">PrivateCloudProfileSpec
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#core.gardener.cloud/v1beta1.PrivateCloudProfile">PrivateCloudProfile</a>)
+</p>
+<p>
+<p>PrivateCloudProfileSpec is the specification of a PrivateCloudProfile.
+It must contain exactly one of its defined keys.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>caBundle</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>CABundle is a certificate bundle which will be installed onto every host machine of shoot cluster targeting this profile.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>kubernetes</code></br>
+<em>
+<a href="#core.gardener.cloud/v1beta1.KubernetesSettings">
+KubernetesSettings
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Kubernetes contains constraints regarding allowed values of the &lsquo;kubernetes&rsquo; block in the Shoot specification.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>machineImages</code></br>
+<em>
+<a href="#core.gardener.cloud/v1beta1.MachineImage">
+[]MachineImage
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>MachineImages contains constraints regarding allowed values for machine images in the Shoot specification.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>machineTypes</code></br>
+<em>
+<a href="#core.gardener.cloud/v1beta1.MachineType">
+[]MachineType
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>MachineTypes contains constraints regarding allowed values for machine types in the &lsquo;workers&rsquo; block in the Shoot specification.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>regions</code></br>
+<em>
+<a href="#core.gardener.cloud/v1beta1.Region">
+[]Region
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Regions contains constraints regarding allowed values for regions and zones.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>seedSelector</code></br>
+<em>
+<a href="#core.gardener.cloud/v1beta1.SeedSelector">
+SeedSelector
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>SeedSelector contains an optional list of labels on <code>Seed</code> resources that marks those seeds whose shoots may use this provider profile.
+An empty list means that all seeds of the same provider type are supported.
+This is useful for environments that are of the same type (like openstack) but may have different &ldquo;instances&rdquo;/landscapes.
+Optionally a list of possible providers can be added to enable cross-provider scheduling. By default, the provider
+type of the seed must match the shoot&rsquo;s provider.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>volumeTypes</code></br>
+<em>
+<a href="#core.gardener.cloud/v1beta1.VolumeType">
+[]VolumeType
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>VolumeTypes contains constraints regarding allowed values for volume types in the &lsquo;workers&rsquo; block in the Shoot specification.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>parent</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>A pointer to the PrivateCloudProfiles parent CloudProfile</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="core.gardener.cloud/v1beta1.ProjectMember">ProjectMember
 </h3>
 <p>
@@ -8463,7 +8778,8 @@ Kubernetes core/v1.ObjectReference
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#core.gardener.cloud/v1beta1.CloudProfileSpec">CloudProfileSpec</a>)
+<a href="#core.gardener.cloud/v1beta1.CloudProfileSpec">CloudProfileSpec</a>, 
+<a href="#core.gardener.cloud/v1beta1.PrivateCloudProfileSpec">PrivateCloudProfileSpec</a>)
 </p>
 <p>
 <p>Region contains certain properties of a region.</p>
@@ -9007,6 +9323,7 @@ string
 (<em>Appears on:</em>
 <a href="#core.gardener.cloud/v1beta1.CloudProfileSpec">CloudProfileSpec</a>, 
 <a href="#core.gardener.cloud/v1beta1.ExposureClassScheduling">ExposureClassScheduling</a>, 
+<a href="#core.gardener.cloud/v1beta1.PrivateCloudProfileSpec">PrivateCloudProfileSpec</a>, 
 <a href="#core.gardener.cloud/v1beta1.ShootSpec">ShootSpec</a>)
 </p>
 <p>
@@ -11966,7 +12283,8 @@ bool
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#core.gardener.cloud/v1beta1.CloudProfileSpec">CloudProfileSpec</a>)
+<a href="#core.gardener.cloud/v1beta1.CloudProfileSpec">CloudProfileSpec</a>, 
+<a href="#core.gardener.cloud/v1beta1.PrivateCloudProfileSpec">PrivateCloudProfileSpec</a>)
 </p>
 <p>
 <p>VolumeType contains certain properties of a volume type.</p>

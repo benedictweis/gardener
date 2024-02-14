@@ -152,6 +152,20 @@ func (mr *MockCoreV1beta1InterfaceMockRecorder) InternalSecrets(arg0 interface{}
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InternalSecrets", reflect.TypeOf((*MockCoreV1beta1Interface)(nil).InternalSecrets), arg0)
 }
 
+// PrivateCloudProfiles mocks base method.
+func (m *MockCoreV1beta1Interface) PrivateCloudProfiles(arg0 string) v1beta10.PrivateCloudProfileInterface {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PrivateCloudProfiles", arg0)
+	ret0, _ := ret[0].(v1beta10.PrivateCloudProfileInterface)
+	return ret0
+}
+
+// PrivateCloudProfiles indicates an expected call of PrivateCloudProfiles.
+func (mr *MockCoreV1beta1InterfaceMockRecorder) PrivateCloudProfiles(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PrivateCloudProfiles", reflect.TypeOf((*MockCoreV1beta1Interface)(nil).PrivateCloudProfiles), arg0)
+}
+
 // Projects mocks base method.
 func (m *MockCoreV1beta1Interface) Projects() v1beta10.ProjectInterface {
 	m.ctrl.T.Helper()

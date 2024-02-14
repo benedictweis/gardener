@@ -34,6 +34,8 @@ type ExposureClassExpansion interface{}
 
 type InternalSecretExpansion interface{}
 
+type PrivateCloudProfileExpansion interface{}
+
 type ProjectExpansion interface{}
 
 type QuotaExpansion interface{}

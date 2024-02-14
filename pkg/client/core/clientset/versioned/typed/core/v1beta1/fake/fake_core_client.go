@@ -60,6 +60,10 @@ func (c *FakeCoreV1beta1) InternalSecrets(namespace string) v1beta1.InternalSecr
 	return &FakeInternalSecrets{c, namespace}
 }
 
+func (c *FakeCoreV1beta1) PrivateCloudProfiles(namespace string) v1beta1.PrivateCloudProfileInterface {
+	return &FakePrivateCloudProfiles{c, namespace}
+}
+
 func (c *FakeCoreV1beta1) Projects() v1beta1.ProjectInterface {
 	return &FakeProjects{c}
 }

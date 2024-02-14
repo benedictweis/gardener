@@ -32,6 +32,10 @@ API rule violation: list_type_missing,github.com/gardener/gardener/pkg/apis/core
 API rule violation: list_type_missing,github.com/gardener/gardener/pkg/apis/core/v1beta1,Networking,IPFamilies
 API rule violation: list_type_missing,github.com/gardener/gardener/pkg/apis/core/v1beta1,NginxIngress,LoadBalancerSourceRanges
 API rule violation: list_type_missing,github.com/gardener/gardener/pkg/apis/core/v1beta1,OIDCConfig,SigningAlgs
+API rule violation: list_type_missing,github.com/gardener/gardener/pkg/apis/core/v1beta1,PrivateCloudProfileSpec,MachineImages
+API rule violation: list_type_missing,github.com/gardener/gardener/pkg/apis/core/v1beta1,PrivateCloudProfileSpec,MachineTypes
+API rule violation: list_type_missing,github.com/gardener/gardener/pkg/apis/core/v1beta1,PrivateCloudProfileSpec,Regions
+API rule violation: list_type_missing,github.com/gardener/gardener/pkg/apis/core/v1beta1,PrivateCloudProfileSpec,VolumeTypes
 API rule violation: list_type_missing,github.com/gardener/gardener/pkg/apis/core/v1beta1,ProjectMember,Roles
 API rule violation: list_type_missing,github.com/gardener/gardener/pkg/apis/core/v1beta1,ProjectSpec,Members
 API rule violation: list_type_missing,github.com/gardener/gardener/pkg/apis/core/v1beta1,ProjectTolerations,Defaults

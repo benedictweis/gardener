@@ -139,6 +139,9 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.OIDCConfig":                                 schema_pkg_apis_core_v1beta1_OIDCConfig(ref),
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.ObservabilityRotation":                      schema_pkg_apis_core_v1beta1_ObservabilityRotation(ref),
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.OpenIDConnectClientAuthentication":          schema_pkg_apis_core_v1beta1_OpenIDConnectClientAuthentication(ref),
+		"github.com/gardener/gardener/pkg/apis/core/v1beta1.PrivateCloudProfile":                        schema_pkg_apis_core_v1beta1_PrivateCloudProfile(ref),
+		"github.com/gardener/gardener/pkg/apis/core/v1beta1.PrivateCloudProfileList":                    schema_pkg_apis_core_v1beta1_PrivateCloudProfileList(ref),
+		"github.com/gardener/gardener/pkg/apis/core/v1beta1.PrivateCloudProfileSpec":                    schema_pkg_apis_core_v1beta1_PrivateCloudProfileSpec(ref),
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.Project":                                    schema_pkg_apis_core_v1beta1_Project(ref),
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.ProjectList":                                schema_pkg_apis_core_v1beta1_ProjectList(ref),
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.ProjectMember":                              schema_pkg_apis_core_v1beta1_ProjectMember(ref),
@@ -5428,6 +5431,222 @@ func schema_pkg_apis_core_v1beta1_OpenIDConnectClientAuthentication(ref common.R
 				},
 			},
 		},
+	}
+}
+
+func schema_pkg_apis_core_v1beta1_PrivateCloudProfile(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PrivateCloudProfile represents certain properties about a provider environment.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard object metadata.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec defines the provider environment properties.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/gardener/gardener/pkg/apis/core/v1beta1.PrivateCloudProfileSpec"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/gardener/gardener/pkg/apis/core/v1beta1.PrivateCloudProfileSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+	}
+}
+
+func schema_pkg_apis_core_v1beta1_PrivateCloudProfileList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PrivateCloudProfileList is a collection of CloudProfiles.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Standard list object metadata.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Items is the list of CloudProfiles.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/gardener/gardener/pkg/apis/core/v1beta1.PrivateCloudProfile"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"github.com/gardener/gardener/pkg/apis/core/v1beta1.PrivateCloudProfile", "k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"},
+	}
+}
+
+func schema_pkg_apis_core_v1beta1_PrivateCloudProfileSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PrivateCloudProfileSpec is the specification of a PrivateCloudProfile. It must contain exactly one of its defined keys.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"caBundle": {
+						SchemaProps: spec.SchemaProps{
+							Description: "CABundle is a certificate bundle which will be installed onto every host machine of shoot cluster targeting this profile.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"kubernetes": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kubernetes contains constraints regarding allowed values of the 'kubernetes' block in the Shoot specification.",
+							Ref:         ref("github.com/gardener/gardener/pkg/apis/core/v1beta1.KubernetesSettings"),
+						},
+					},
+					"machineImages": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-patch-merge-key": "name",
+								"x-kubernetes-patch-strategy":  "merge",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "MachineImages contains constraints regarding allowed values for machine images in the Shoot specification.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/gardener/gardener/pkg/apis/core/v1beta1.MachineImage"),
+									},
+								},
+							},
+						},
+					},
+					"machineTypes": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-patch-merge-key": "name",
+								"x-kubernetes-patch-strategy":  "merge",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "MachineTypes contains constraints regarding allowed values for machine types in the 'workers' block in the Shoot specification.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/gardener/gardener/pkg/apis/core/v1beta1.MachineType"),
+									},
+								},
+							},
+						},
+					},
+					"regions": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-patch-merge-key": "name",
+								"x-kubernetes-patch-strategy":  "merge",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Regions contains constraints regarding allowed values for regions and zones.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/gardener/gardener/pkg/apis/core/v1beta1.Region"),
+									},
+								},
+							},
+						},
+					},
+					"seedSelector": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SeedSelector contains an optional list of labels on `Seed` resources that marks those seeds whose shoots may use this provider profile. An empty list means that all seeds of the same provider type are supported. This is useful for environments that are of the same type (like openstack) but may have different \"instances\"/landscapes. Optionally a list of possible providers can be added to enable cross-provider scheduling. By default, the provider type of the seed must match the shoot's provider.",
+							Ref:         ref("github.com/gardener/gardener/pkg/apis/core/v1beta1.SeedSelector"),
+						},
+					},
+					"volumeTypes": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-patch-merge-key": "name",
+								"x-kubernetes-patch-strategy":  "merge",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "VolumeTypes contains constraints regarding allowed values for volume types in the 'workers' block in the Shoot specification.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("github.com/gardener/gardener/pkg/apis/core/v1beta1.VolumeType"),
+									},
+								},
+							},
+						},
+					},
+					"parent": {
+						SchemaProps: spec.SchemaProps{
+							Description: "A pointer to the PrivateCloudProfiles parent CloudProfile",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/gardener/gardener/pkg/apis/core/v1beta1.KubernetesSettings", "github.com/gardener/gardener/pkg/apis/core/v1beta1.MachineImage", "github.com/gardener/gardener/pkg/apis/core/v1beta1.MachineType", "github.com/gardener/gardener/pkg/apis/core/v1beta1.Region", "github.com/gardener/gardener/pkg/apis/core/v1beta1.SeedSelector", "github.com/gardener/gardener/pkg/apis/core/v1beta1.VolumeType"},
 	}
 }
 
