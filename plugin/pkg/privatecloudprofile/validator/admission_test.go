@@ -1,4 +1,4 @@
-// Copyright 2021 SAP SE or an SAP affiliate company. All rights reserved. This file is licensed under the Apache Software License, v. 2 except as noted otherwise in the LICENSE file
+// Copyright 2024 SAP SE or an SAP affiliate company. All rights reserved. This file is licensed under the Apache Software License, v. 2 except as noted otherwise in the LICENSE file
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,18 +16,19 @@ package validator_test
 
 import (
 	"context"
-	gardencoreinformers "github.com/gardener/gardener/pkg/client/core/informers/internalversion"
 
-	"github.com/gardener/gardener/pkg/apis/core"
-	. "github.com/gardener/gardener/plugin/pkg/privatecloudprofile/validator"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apiserver/pkg/admission"
+
+	"github.com/gardener/gardener/pkg/apis/core"
+	gardencoreinformers "github.com/gardener/gardener/pkg/client/core/informers/internalversion"
+	. "github.com/gardener/gardener/plugin/pkg/privatecloudprofile/validator"
 )
 
 var _ = Describe("Admission", func() {
-	Describe("#Admit", func() {
+	Describe("#Validate", func() {
 		var (
 			ctx                 context.Context
 			admissionHandler    *ValidatePrivateCloudProfile
@@ -72,7 +73,7 @@ var _ = Describe("Admission", func() {
 
 			attrs := admission.NewAttributesRecord(&privateCloudProfile, nil, core.Kind("PrivateCloudProfile").WithVersion("version"), "", privateCloudProfile.Name, core.Resource("privatecloudprofile").WithVersion("version"), "", admission.Create, &metav1.CreateOptions{}, false, nil)
 
-			Expect(admissionHandler.Admit(ctx, attrs, nil)).To(MatchError(ContainSubstring("parent CloudProfile could not be found")))
+			Expect(admissionHandler.Validate(ctx, attrs, nil)).To(MatchError(ContainSubstring("parent CloudProfile could not be found")))
 		})
 
 		It("should allow creating a PrivateCloudProfile with a valid parent reference", func() {
@@ -82,7 +83,7 @@ var _ = Describe("Admission", func() {
 
 			attrs := admission.NewAttributesRecord(&privateCloudProfile, nil, core.Kind("PrivateCloudProfile").WithVersion("version"), "", privateCloudProfile.Name, core.Resource("privatecloudprofile").WithVersion("version"), "", admission.Create, &metav1.CreateOptions{}, false, nil)
 
-			Expect(admissionHandler.Admit(ctx, attrs, nil)).To(Succeed())
+			Expect(admissionHandler.Validate(ctx, attrs, nil)).To(Succeed())
 		})
 
 		It("should not allow creating a PrivateCloudProfile that defines a machineType of the parent CloudProfile", func() {
@@ -94,8 +95,8 @@ var _ = Describe("Admission", func() {
 
 			attrs := admission.NewAttributesRecord(&privateCloudProfile, nil, core.Kind("PrivateCloudProfile").WithVersion("version"), "", privateCloudProfile.Name, core.Resource("privatecloudprofile").WithVersion("version"), "", admission.Create, &metav1.CreateOptions{}, false, nil)
 
-			Expect(admissionHandler.Admit(ctx, attrs, nil)).To(MatchError(ContainSubstring("PrivateCloudProfile attempts to rewrite MachineType of parent CloudProfile with machineType")))
-			Expect(admissionHandler.Admit(ctx, attrs, nil)).To(MatchError(ContainSubstring("my-machine")))
+			Expect(admissionHandler.Validate(ctx, attrs, nil)).To(MatchError(ContainSubstring("PrivateCloudProfile attempts to rewrite MachineType of parent CloudProfile with machineType")))
+			Expect(admissionHandler.Validate(ctx, attrs, nil)).To(MatchError(ContainSubstring("my-machine")))
 		})
 
 		It("should allow creating a PrivateCloudProfile that defines a machineType of the parent CloudProfile if it was added to the PrivateCloudProfile first", func() {
@@ -106,13 +107,13 @@ var _ = Describe("Admission", func() {
 
 			attrs := admission.NewAttributesRecord(&privateCloudProfile, nil, core.Kind("PrivateCloudProfile").WithVersion("version"), "", privateCloudProfile.Name, core.Resource("privatecloudprofile").WithVersion("version"), "", admission.Create, &metav1.CreateOptions{}, false, nil)
 
-			Expect(admissionHandler.Admit(ctx, attrs, nil)).To(Succeed())
+			Expect(admissionHandler.Validate(ctx, attrs, nil)).To(Succeed())
 
 			parentCloudProfile.Spec.MachineTypes = []core.MachineType{machineType}
 
 			attrs = admission.NewAttributesRecord(&privateCloudProfile, &privateCloudProfile, core.Kind("PrivateCloudProfile").WithVersion("version"), "", privateCloudProfile.Name, core.Resource("privatecloudprofile").WithVersion("version"), "", admission.Update, &metav1.CreateOptions{}, false, nil)
 
-			Expect(admissionHandler.Admit(ctx, attrs, nil)).To(Succeed())
+			Expect(admissionHandler.Validate(ctx, attrs, nil)).To(Succeed())
 		})
 
 		It("should allow creating a PrivateCloudProfile that defines a machineType of the parent CloudProfile if it was added to the PrivateCloudProfile first but is changed", func() {
@@ -123,7 +124,7 @@ var _ = Describe("Admission", func() {
 
 			attrs := admission.NewAttributesRecord(&privateCloudProfile, nil, core.Kind("PrivateCloudProfile").WithVersion("version"), "", privateCloudProfile.Name, core.Resource("privatecloudprofile").WithVersion("version"), "", admission.Create, &metav1.CreateOptions{}, false, nil)
 
-			Expect(admissionHandler.Admit(ctx, attrs, nil)).To(Succeed())
+			Expect(admissionHandler.Validate(ctx, attrs, nil)).To(Succeed())
 
 			oldPrivateCloudProfile := *privateCloudProfile.DeepCopy()
 			privateCloudProfile.Spec.MachineImages = []core.MachineImage{{Name: "my-image"}}
@@ -131,7 +132,7 @@ var _ = Describe("Admission", func() {
 
 			attrs = admission.NewAttributesRecord(&privateCloudProfile, &oldPrivateCloudProfile, core.Kind("PrivateCloudProfile").WithVersion("version"), "", privateCloudProfile.Name, core.Resource("privatecloudprofile").WithVersion("version"), "", admission.Update, &metav1.CreateOptions{}, false, nil)
 
-			Expect(admissionHandler.Admit(ctx, attrs, nil)).To(Succeed())
+			Expect(admissionHandler.Validate(ctx, attrs, nil)).To(Succeed())
 		})
 	})
 

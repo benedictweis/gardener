@@ -1,4 +1,4 @@
-// Copyright 2021 SAP SE or an SAP affiliate company. All rights reserved. This file is licensed under the Apache Software License, v. 2 except as noted otherwise in the LICENSE file
+// Copyright 2024 SAP SE or an SAP affiliate company. All rights reserved. This file is licensed under the Apache Software License, v. 2 except as noted otherwise in the LICENSE file
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,15 +18,17 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/gardener/gardener/pkg/apis/core"
-	admissioninitializer "github.com/gardener/gardener/pkg/apiserver/admission/initializer"
-	coreinformers "github.com/gardener/gardener/pkg/client/core/informers/internalversion"
-	corelisters "github.com/gardener/gardener/pkg/client/core/listers/core/internalversion"
-	plugin "github.com/gardener/gardener/plugin/pkg"
 	"io"
+	"reflect"
+
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apiserver/pkg/admission"
-	"reflect"
+
+	"github.com/gardener/gardener/pkg/apis/core"
+	admissioninitializer "github.com/gardener/gardener/pkg/apiserver/admission/initializer"
+	gardencoreinformers "github.com/gardener/gardener/pkg/client/core/informers/internalversion"
+	gardencorelisters "github.com/gardener/gardener/pkg/client/core/listers/core/internalversion"
+	plugin "github.com/gardener/gardener/plugin/pkg"
 )
 
 // Register registers a plugin.
@@ -39,7 +41,7 @@ func Register(plugins *admission.Plugins) {
 // ValidatePrivateCloudProfile contains listers and admission handler.
 type ValidatePrivateCloudProfile struct {
 	*admission.Handler
-	cloudProfileLister corelisters.CloudProfileLister
+	cloudProfileLister gardencorelisters.CloudProfileLister
 	readyFunc          admission.ReadyFunc
 }
 
@@ -62,7 +64,7 @@ func (v *ValidatePrivateCloudProfile) AssignReadyFunc(f admission.ReadyFunc) {
 }
 
 // SetInternalCoreInformerFactory gets Lister from SharedInformerFactory.
-func (v *ValidatePrivateCloudProfile) SetInternalCoreInformerFactory(f coreinformers.SharedInformerFactory) {
+func (v *ValidatePrivateCloudProfile) SetInternalCoreInformerFactory(f gardencoreinformers.SharedInformerFactory) {
 	cloudProfileInformer := f.Core().InternalVersion().CloudProfiles()
 	v.cloudProfileLister = cloudProfileInformer.Lister()
 
@@ -77,11 +79,10 @@ func (v *ValidatePrivateCloudProfile) ValidateInitialization() error {
 	return nil
 }
 
-// TODO change to validate
-var _ admission.MutationInterface = &ValidatePrivateCloudProfile{}
+var _ admission.ValidationInterface = &ValidatePrivateCloudProfile{}
 
-// Admit admits TODO
-func (v *ValidatePrivateCloudProfile) Admit(_ context.Context, a admission.Attributes, _ admission.ObjectInterfaces) error {
+// Validate validates the PrivateCloudProfile
+func (v *ValidatePrivateCloudProfile) Validate(_ context.Context, a admission.Attributes, _ admission.ObjectInterfaces) error {
 	// Wait until the caches have been synced
 	if v.readyFunc == nil {
 		v.AssignReadyFunc(func() bool {
@@ -105,13 +106,9 @@ func (v *ValidatePrivateCloudProfile) Admit(_ context.Context, a admission.Attri
 		return nil
 	}
 
-	var (
-		privateCloudProfile    = &core.PrivateCloudProfile{}
-		oldPrivateCloudProfile = &core.PrivateCloudProfile{}
-		convertIsSuccessful    bool
-	)
+	var oldPrivateCloudProfile = &core.PrivateCloudProfile{}
 
-	privateCloudProfile, convertIsSuccessful = a.GetObject().(*core.PrivateCloudProfile)
+	privateCloudProfile, convertIsSuccessful := a.GetObject().(*core.PrivateCloudProfile)
 	if !convertIsSuccessful {
 		return apierrors.NewInternalError(errors.New("could not convert object to PrivateCloudProfile"))
 	}
