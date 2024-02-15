@@ -77,8 +77,10 @@ func (v *ValidatePrivateCloudProfile) ValidateInitialization() error {
 	return nil
 }
 
+// TODO change to validate
 var _ admission.MutationInterface = &ValidatePrivateCloudProfile{}
 
+// Admit admits TODO
 func (v *ValidatePrivateCloudProfile) Admit(_ context.Context, a admission.Attributes, _ admission.ObjectInterfaces) error {
 	// Wait until the caches have been synced
 	if v.readyFunc == nil {

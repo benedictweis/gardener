@@ -27,7 +27,7 @@ import (
 func ValidatePrivateCloudProfile(cloudProfile *core.PrivateCloudProfile) field.ErrorList {
 	allErrs := field.ErrorList{}
 
-	allErrs = append(allErrs, apivalidation.ValidateObjectMeta(&cloudProfile.ObjectMeta, false, ValidateName, field.NewPath("metadata"))...)
+	allErrs = append(allErrs, apivalidation.ValidateObjectMeta(&cloudProfile.ObjectMeta, true, ValidateName, field.NewPath("metadata"))...)
 	allErrs = append(allErrs, ValidatePrivateCloudProfileSpec(&cloudProfile.Spec, field.NewPath("spec"))...)
 
 	return allErrs

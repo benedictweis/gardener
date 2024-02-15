@@ -81,19 +81,23 @@ func (privateCloudProfileStrategy) WarningsOnUpdate(_ context.Context, _, _ runt
 	return nil
 }
 
-func dropExpiredVersions(cloudProfile *core.PrivateCloudProfile) {
+func dropExpiredVersions(privateCloudProfile *core.PrivateCloudProfile) {
+	if privateCloudProfile.Spec.Kubernetes == nil {
+		return
+	}
+
 	var validKubernetesVersions []core.ExpirableVersion
 
-	for _, version := range cloudProfile.Spec.Kubernetes.Versions {
+	for _, version := range privateCloudProfile.Spec.Kubernetes.Versions {
 		if version.ExpirationDate != nil && version.ExpirationDate.Time.Before(time.Now()) {
 			continue
 		}
 		validKubernetesVersions = append(validKubernetesVersions, version)
 	}
 
-	cloudProfile.Spec.Kubernetes.Versions = validKubernetesVersions
+	privateCloudProfile.Spec.Kubernetes.Versions = validKubernetesVersions
 
-	for i, machineImage := range cloudProfile.Spec.MachineImages {
+	for i, machineImage := range privateCloudProfile.Spec.MachineImages {
 		var validMachineImageVersions []core.MachineImageVersion
 
 		for _, version := range machineImage.Versions {
@@ -103,6 +107,6 @@ func dropExpiredVersions(cloudProfile *core.PrivateCloudProfile) {
 			validMachineImageVersions = append(validMachineImageVersions, version)
 		}
 
-		cloudProfile.Spec.MachineImages[i].Versions = validMachineImageVersions
+		privateCloudProfile.Spec.MachineImages[i].Versions = validMachineImageVersions
 	}
 }
