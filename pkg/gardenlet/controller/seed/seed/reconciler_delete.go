@@ -28,7 +28,6 @@ import (
 	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	gardencorev1beta1 "github.com/gardener/gardener/pkg/apis/core/v1beta1"
 	v1beta1constants "github.com/gardener/gardener/pkg/apis/core/v1beta1/constants"
@@ -63,14 +62,11 @@ func (r *Reconciler) delete(
 	log logr.Logger,
 	seedObj *seedpkg.Seed,
 	seedIsGarden bool,
-) (
-	reconcile.Result,
-	error,
-) {
+) error {
 	seed := seedObj.GetInfo()
 
 	if !sets.New(seed.Finalizers...).Has(gardencorev1beta1.GardenerName) {
-		return reconcile.Result{}, nil
+		return nil
 	}
 
 	// Before deletion, it has to be ensured that no Shoots nor BackupBuckets depend on the Seed anymore.
@@ -79,51 +75,51 @@ func (r *Reconciler) delete(
 
 	associatedShoots, err := controllerutils.DetermineShootsAssociatedTo(ctx, r.GardenClient, seed)
 	if err != nil {
-		return reconcile.Result{}, err
+		return err
 	}
 
 	if len(associatedShoots) > 0 {
 		log.Info("Cannot delete Seed because the following Shoots are still referencing it", "shoots", associatedShoots)
 		r.Recorder.Event(seed, corev1.EventTypeNormal, v1beta1constants.EventResourceReferenced, fmt.Sprintf("%s Shoots=%v", parentLogMessage, associatedShoots))
 
-		return reconcile.Result{}, errors.New("seed still has references")
+		return errors.New("seed still has references")
 	}
 
 	if seed.Spec.Backup != nil {
 		backupBucket := &gardencorev1beta1.BackupBucket{ObjectMeta: metav1.ObjectMeta{Name: string(seed.UID)}}
 
 		if err := r.GardenClient.Delete(ctx, backupBucket); client.IgnoreNotFound(err) != nil {
-			return reconcile.Result{}, err
+			return err
 		}
 	}
 
 	associatedBackupBuckets, err := controllerutils.DetermineBackupBucketAssociations(ctx, r.GardenClient, seed.Name)
 	if err != nil {
-		return reconcile.Result{}, err
+		return err
 	}
 
 	if len(associatedBackupBuckets) > 0 {
 		log.Info("Cannot delete Seed because the following BackupBuckets are still referencing it", "backupBuckets", associatedBackupBuckets)
 		r.Recorder.Event(seed, corev1.EventTypeNormal, v1beta1constants.EventResourceReferenced, fmt.Sprintf("%s BackupBuckets=%v", parentLogMessage, associatedBackupBuckets))
 
-		return reconcile.Result{}, errors.New("seed still has references")
+		return errors.New("seed still has references")
 	}
 
 	log.Info("No Shoots or BackupBuckets are referencing the Seed, deletion accepted")
 
 	if err := r.runDeleteSeedFlow(ctx, log, seedObj, seedIsGarden); err != nil {
-		return reconcile.Result{}, err
+		return err
 	}
 
 	// Remove finalizer from Seed
 	if controllerutil.ContainsFinalizer(seed, gardencorev1beta1.GardenerName) {
 		log.Info("Removing finalizer")
 		if err := controllerutils.RemoveFinalizers(ctx, r.GardenClient, seed, gardencorev1beta1.GardenerName); err != nil {
-			return reconcile.Result{}, fmt.Errorf("failed to remove finalizer: %w", err)
+			return fmt.Errorf("failed to remove finalizer: %w", err)
 		}
 	}
 
-	return reconcile.Result{}, nil
+	return nil
 }
 
 func (r *Reconciler) runDeleteSeedFlow(
@@ -195,6 +191,11 @@ func (r *Reconciler) runDeleteSeedFlow(
 		fluentOperatorCustomResources = fluentoperator.NewCustomResources(seedClient, r.GardenNamespace, fluentoperator.CustomResourcesValues{})
 	)
 
+	cachePrometheus, err := defaultCachePrometheus(log, seedClient, r.GardenNamespace, seed)
+	if err != nil {
+		return err
+	}
+
 	var (
 		g                = flow.NewGraph("Seed cluster deletion")
 		destroyDNSRecord = g.Add(flow.Task{
@@ -205,6 +206,10 @@ func (r *Reconciler) runDeleteSeedFlow(
 			Name:         "Ensuring no ControllerInstallations are left",
 			Fn:           ensureNoControllerInstallations(r.GardenClient, seed.GetInfo().Name),
 			Dependencies: flow.NewTaskIDs(destroyDNSRecord),
+		})
+		destroyCachePrometheus = g.Add(flow.Task{
+			Name: "Destroying cache Prometheus",
+			Fn:   cachePrometheus.Destroy,
 		})
 		destroyClusterAutoscaler = g.Add(flow.Task{
 			Name: "Destroying cluster-autoscaler resources",
@@ -258,6 +263,7 @@ func (r *Reconciler) runDeleteSeedFlow(
 			Fn:   component.OpDestroyAndWait(fluentOperatorCustomResources).Destroy,
 		})
 		syncPointCleanedUp = flow.NewTaskIDs(
+			destroyCachePrometheus,
 			destroyNginxIngress,
 			destroyClusterAutoscaler,
 			destroyMachineControllerManager,
