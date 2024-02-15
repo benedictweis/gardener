@@ -46,6 +46,9 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 					"Field": Equal("metadata.name"),
 				})), PointTo(MatchFields(IgnoreExtras, Fields{
 					"Type":  Equal(field.ErrorTypeRequired),
+					"Field": Equal("metadata.namespace"),
+				})), PointTo(MatchFields(IgnoreExtras, Fields{
+					"Type":  Equal(field.ErrorTypeRequired),
 					"Field": Equal("spec.parent"),
 				}))))
 		})
@@ -53,7 +56,8 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 		It("should allow PrivateCloudProfile resource with only name and parent field", func() {
 			privateCloudProfile := &core.PrivateCloudProfile{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: "profile",
+					Name:      "profile",
+					Namespace: "default",
 				},
 				Spec: core.PrivateCloudProfileSpec{
 					Parent: "parent-profile",
@@ -67,8 +71,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 
 		Context("tests for unknown cloud profiles", func() {
 			var (
-				// TODO can this be named cloudProfile or should it be named privateCloudProfile?
-				cloudProfile *core.PrivateCloudProfile
+				privateCloudProfile *core.PrivateCloudProfile
 
 				duplicatedKubernetes = core.KubernetesSettings{
 					Versions: []core.ExpirableVersion{{Version: "1.11.4"}, {Version: "1.11.4", Classification: &previewClassification}},
@@ -99,8 +102,11 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 			)
 
 			BeforeEach(func() {
-				cloudProfile = &core.PrivateCloudProfile{
-					ObjectMeta: metadata,
+				privateCloudProfile = &core.PrivateCloudProfile{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "profile",
+						Namespace: "default",
+					},
 					Spec: core.PrivateCloudProfileSpec{
 						Parent: "unknown",
 						SeedSelector: &core.SeedSelector{
@@ -141,39 +147,40 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 			})
 
 			It("should not return any errors", func() {
-				errorList := ValidatePrivateCloudProfile(cloudProfile)
+				errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 				Expect(errorList).To(BeEmpty())
 			})
 
-			DescribeTable("CloudProfile metadata",
+			DescribeTable("privateCloudProfile metadata",
 				func(objectMeta metav1.ObjectMeta, matcher gomegatypes.GomegaMatcher) {
-					cloudProfile.ObjectMeta = objectMeta
+					privateCloudProfile.ObjectMeta = objectMeta
+					privateCloudProfile.ObjectMeta.Namespace = "default"
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(matcher)
 				},
 
-				Entry("should forbid CloudProfile with empty metadata",
+				Entry("should forbid privateCloudProfile with empty metadata",
 					metav1.ObjectMeta{},
 					ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeRequired),
 						"Field": Equal("metadata.name"),
 					}))),
 				),
-				Entry("should forbid CloudProfile with empty name",
+				Entry("should forbid privateCloudProfile with empty name",
 					metav1.ObjectMeta{Name: ""},
 					ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeRequired),
 						"Field": Equal("metadata.name"),
 					}))),
 				),
-				Entry("should allow CloudProfile with '.' in the name",
+				Entry("should allow privateCloudProfile with '.' in the name",
 					metav1.ObjectMeta{Name: "profile.test"},
 					BeEmpty(),
 				),
-				Entry("should forbid CloudProfile with '_' in the name (not a DNS-1123 subdomain)",
+				Entry("should forbid privateCloudProfile with '_' in the name (not a DNS-1123 subdomain)",
 					metav1.ObjectMeta{Name: "profile_test"},
 					ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeInvalid),
@@ -183,9 +190,9 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 			)
 
 			It("should forbid not specifying a parent", func() {
-				cloudProfile.Spec.Parent = ""
+				privateCloudProfile.Spec.Parent = ""
 
-				errorList := ValidatePrivateCloudProfile(cloudProfile)
+				errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 				Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 					"Type":  Equal(field.ErrorTypeRequired),
@@ -194,9 +201,9 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 			})
 
 			It("should forbid ca bundles with unsupported format", func() {
-				cloudProfile.Spec.CABundle = ptr.To("unsupported")
+				privateCloudProfile.Spec.CABundle = ptr.To("unsupported")
 
-				errorList := ValidatePrivateCloudProfile(cloudProfile)
+				errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 				Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 					"Type":  Equal(field.ErrorTypeInvalid),
@@ -206,9 +213,9 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 
 			Context("kubernetes version constraints", func() {
 				It("should enforce that at least one version has been defined", func() {
-					cloudProfile.Spec.Kubernetes.Versions = []core.ExpirableVersion{}
+					privateCloudProfile.Spec.Kubernetes.Versions = []core.ExpirableVersion{}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeRequired),
@@ -220,9 +227,9 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 				})
 
 				It("should forbid versions of a not allowed pattern", func() {
-					cloudProfile.Spec.Kubernetes.Versions = []core.ExpirableVersion{{Version: "1.11"}}
+					privateCloudProfile.Spec.Kubernetes.Versions = []core.ExpirableVersion{{Version: "1.11"}}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeInvalid),
@@ -232,7 +239,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 
 				It("should forbid expiration date on latest kubernetes version", func() {
 					expirationDate := &metav1.Time{Time: time.Now().AddDate(0, 0, 1)}
-					cloudProfile.Spec.Kubernetes.Versions = []core.ExpirableVersion{
+					privateCloudProfile.Spec.Kubernetes.Versions = []core.ExpirableVersion{
 						{
 							Version:        "1.1.0",
 							Classification: &supportedClassification,
@@ -244,7 +251,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 						},
 					}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeInvalid),
@@ -253,9 +260,9 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 				})
 
 				It("should forbid duplicated kubernetes versions", func() {
-					cloudProfile.Spec.Kubernetes = &duplicatedKubernetes
+					privateCloudProfile.Spec.Kubernetes = &duplicatedKubernetes
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(
 						PointTo(MatchFields(IgnoreExtras, Fields{
@@ -266,14 +273,14 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 
 				It("should forbid invalid classification for kubernetes versions", func() {
 					classification := core.VersionClassification("dummy")
-					cloudProfile.Spec.Kubernetes.Versions = []core.ExpirableVersion{
+					privateCloudProfile.Spec.Kubernetes.Versions = []core.ExpirableVersion{
 						{
 							Version:        "1.1.0",
 							Classification: &classification,
 						},
 					}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":     Equal(field.ErrorTypeNotSupported),
@@ -283,7 +290,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 				})
 
 				It("only allow one supported version per minor version", func() {
-					cloudProfile.Spec.Kubernetes.Versions = []core.ExpirableVersion{
+					privateCloudProfile.Spec.Kubernetes.Versions = []core.ExpirableVersion{
 						{
 							Version:        "1.1.0",
 							Classification: &supportedClassification,
@@ -293,7 +300,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 							Classification: &supportedClassification,
 						},
 					}
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeForbidden),
@@ -307,9 +314,9 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 
 			Context("machine image validation", func() {
 				It("should forbid an empty list of machine images", func() {
-					cloudProfile.Spec.MachineImages = []core.MachineImage{}
+					privateCloudProfile.Spec.MachineImages = []core.MachineImage{}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeRequired),
@@ -318,7 +325,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 				})
 
 				It("should forbid duplicate names in list of machine images", func() {
-					cloudProfile.Spec.MachineImages = []core.MachineImage{
+					privateCloudProfile.Spec.MachineImages = []core.MachineImage{
 						{
 							Name: "some-machineimage",
 							Versions: []core.MachineImageVersion{
@@ -345,7 +352,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 						},
 					}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeDuplicate),
@@ -354,11 +361,11 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 				})
 
 				It("should forbid machine images with no version", func() {
-					cloudProfile.Spec.MachineImages = []core.MachineImage{
+					privateCloudProfile.Spec.MachineImages = []core.MachineImage{
 						{Name: "some-machineimage"},
 					}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeRequired),
@@ -371,7 +378,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 
 				It("should forbid machine images with an invalid machine image update strategy", func() {
 					updateStrategy := core.MachineImageUpdateStrategy("dummy")
-					cloudProfile.Spec.MachineImages = []core.MachineImage{
+					privateCloudProfile.Spec.MachineImages = []core.MachineImage{
 						{
 							Name: "some-machineimage",
 							Versions: []core.MachineImageVersion{
@@ -387,7 +394,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 						},
 					}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeNotSupported),
@@ -397,7 +404,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 
 				It("should allow machine images with a valid machine image update strategy", func() {
 					updateStrategy := core.UpdateStrategyMinor
-					cloudProfile.Spec.MachineImages = []core.MachineImage{
+					privateCloudProfile.Spec.MachineImages = []core.MachineImage{
 						{
 							Name: "some-machineimage",
 							Versions: []core.MachineImageVersion{
@@ -413,13 +420,13 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 						},
 					}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(BeEmpty())
 				})
 
 				It("should forbid nonSemVer machine image versions", func() {
-					cloudProfile.Spec.MachineImages = []core.MachineImage{
+					privateCloudProfile.Spec.MachineImages = []core.MachineImage{
 						{
 							Name: "some-machineimage",
 							Versions: []core.MachineImageVersion{
@@ -446,7 +453,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 						},
 					}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeInvalid),
@@ -459,7 +466,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 
 				It("should allow expiration date on latest machine image version", func() {
 					expirationDate := &metav1.Time{Time: time.Now().AddDate(0, 0, 1)}
-					cloudProfile.Spec.MachineImages = []core.MachineImage{
+					privateCloudProfile.Spec.MachineImages = []core.MachineImage{
 						{
 							Name: "some-machineimage",
 							Versions: []core.MachineImageVersion{
@@ -495,13 +502,13 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 						},
 					}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 					Expect(errorList).To(BeEmpty())
 				})
 
 				It("should forbid invalid classification for machine image versions", func() {
 					classification := core.VersionClassification("dummy")
-					cloudProfile.Spec.MachineImages = []core.MachineImage{
+					privateCloudProfile.Spec.MachineImages = []core.MachineImage{
 						{
 							Name: "some-machineimage",
 							Versions: []core.MachineImageVersion{
@@ -516,7 +523,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 						},
 					}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":     Equal(field.ErrorTypeNotSupported),
 						"Field":    Equal("spec.machineImages[0].versions[0].classification"),
@@ -525,7 +532,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 				})
 
 				It("should allow valid CPU architecture for machine image versions", func() {
-					cloudProfile.Spec.MachineImages = []core.MachineImage{
+					privateCloudProfile.Spec.MachineImages = []core.MachineImage{
 						{
 							Name: "some-machineimage",
 							Versions: []core.MachineImageVersion{
@@ -554,12 +561,12 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 						},
 					}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 					Expect(errorList).To(BeEmpty())
 				})
 
 				It("should forbid invalid CPU architecture for machine image versions", func() {
-					cloudProfile.Spec.MachineImages = []core.MachineImage{
+					privateCloudProfile.Spec.MachineImages = []core.MachineImage{
 						{
 							Name: "some-machineimage",
 							Versions: []core.MachineImageVersion{
@@ -574,7 +581,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 						},
 					}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeNotSupported),
 						"Field": Equal("spec.machineImages[0].versions[0].architecture"),
@@ -582,7 +589,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 				})
 
 				It("should allow valid kubeletVersionConstraint for machine image versions", func() {
-					cloudProfile.Spec.MachineImages = []core.MachineImage{
+					privateCloudProfile.Spec.MachineImages = []core.MachineImage{
 						{
 							Name: "some-machineimage",
 							Versions: []core.MachineImageVersion{
@@ -604,12 +611,12 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 						},
 					}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 					Expect(errorList).To(BeEmpty())
 				})
 
 				It("should forbid invalid kubeletVersionConstraint for machine image versions", func() {
-					cloudProfile.Spec.MachineImages = []core.MachineImage{
+					privateCloudProfile.Spec.MachineImages = []core.MachineImage{
 						{
 							Name: "some-machineimage",
 							Versions: []core.MachineImageVersion{
@@ -631,7 +638,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 						},
 					}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 					Expect(errorList).To(ConsistOf(
 						PointTo(MatchFields(IgnoreExtras, Fields{
 							"Type":  Equal(field.ErrorTypeInvalid),
@@ -646,9 +653,9 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 			})
 
 			It("should forbid if no cri is present", func() {
-				cloudProfile.Spec.MachineImages[0].Versions[0].CRI = nil
+				privateCloudProfile.Spec.MachineImages[0].Versions[0].CRI = nil
 
-				errorList := ValidatePrivateCloudProfile(cloudProfile)
+				errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 				Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 					"Type":  Equal(field.ErrorTypeRequired),
@@ -657,7 +664,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 			})
 
 			It("should forbid non-supported container runtime interface names", func() {
-				cloudProfile.Spec.MachineImages = []core.MachineImage{
+				privateCloudProfile.Spec.MachineImages = []core.MachineImage{
 					{
 						Name: "invalid-cri-name",
 						Versions: []core.MachineImageVersion{
@@ -693,7 +700,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 					},
 				}
 
-				errorList := ValidatePrivateCloudProfile(cloudProfile)
+				errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 				Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 					"Type":   Equal(field.ErrorTypeNotSupported),
@@ -708,7 +715,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 			})
 
 			It("should forbid duplicated container runtime interface names", func() {
-				cloudProfile.Spec.MachineImages[0].Versions[0].CRI = []core.CRI{
+				privateCloudProfile.Spec.MachineImages[0].Versions[0].CRI = []core.CRI{
 					{
 						Name: core.CRINameContainerD,
 					},
@@ -717,7 +724,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 					},
 				}
 
-				errorList := ValidatePrivateCloudProfile(cloudProfile)
+				errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 				Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 					"Type":  Equal(field.ErrorTypeDuplicate),
@@ -726,7 +733,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 			})
 
 			It("should forbid duplicated container runtime names", func() {
-				cloudProfile.Spec.MachineImages[0].Versions[0].CRI = []core.CRI{
+				privateCloudProfile.Spec.MachineImages[0].Versions[0].CRI = []core.CRI{
 					{
 						Name: core.CRINameContainerD,
 						ContainerRuntimes: []core.ContainerRuntime{
@@ -740,7 +747,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 					},
 				}
 
-				errorList := ValidatePrivateCloudProfile(cloudProfile)
+				errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 				Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 					"Type":  Equal(field.ErrorTypeDuplicate),
@@ -750,9 +757,9 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 
 			Context("machine types validation", func() {
 				It("should enforce that at least one machine type has been defined", func() {
-					cloudProfile.Spec.MachineTypes = []core.MachineType{}
+					privateCloudProfile.Spec.MachineTypes = []core.MachineType{}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeRequired),
@@ -761,12 +768,12 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 				})
 
 				It("should enforce uniqueness of machine type names", func() {
-					cloudProfile.Spec.MachineTypes = []core.MachineType{
-						cloudProfile.Spec.MachineTypes[0],
-						cloudProfile.Spec.MachineTypes[0],
+					privateCloudProfile.Spec.MachineTypes = []core.MachineType{
+						privateCloudProfile.Spec.MachineTypes[0],
+						privateCloudProfile.Spec.MachineTypes[0],
 					}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeDuplicate),
@@ -775,9 +782,9 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 				})
 
 				It("should forbid machine types with unsupported property values", func() {
-					cloudProfile.Spec.MachineTypes = invalidMachineTypes
+					privateCloudProfile.Spec.MachineTypes = invalidMachineTypes
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeRequired),
@@ -811,23 +818,23 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 				})
 
 				It("should allow machine types with valid values", func() {
-					cloudProfile.Spec.MachineTypes = machineTypesConstraint
+					privateCloudProfile.Spec.MachineTypes = machineTypesConstraint
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 					Expect(errorList).To(BeEmpty())
 				})
 			})
 
 			Context("regions validation", func() {
 				It("should forbid regions with unsupported name values", func() {
-					cloudProfile.Spec.Regions = []core.Region{
+					privateCloudProfile.Spec.Regions = []core.Region{
 						{
 							Name:  "",
 							Zones: []core.AvailabilityZone{{Name: ""}},
 						},
 					}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeRequired),
@@ -839,9 +846,9 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 				})
 
 				It("should forbid duplicated region names", func() {
-					cloudProfile.Spec.Regions = duplicatedRegions
+					privateCloudProfile.Spec.Regions = duplicatedRegions
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(
 						PointTo(MatchFields(IgnoreExtras, Fields{
@@ -851,9 +858,9 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 				})
 
 				It("should forbid duplicated zone names", func() {
-					cloudProfile.Spec.Regions = duplicatedZones
+					privateCloudProfile.Spec.Regions = duplicatedZones
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(
 						PointTo(MatchFields(IgnoreExtras, Fields{
@@ -863,12 +870,12 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 				})
 
 				It("should forbid invalid label specifications", func() {
-					cloudProfile.Spec.Regions[0].Labels = map[string]string{
+					privateCloudProfile.Spec.Regions[0].Labels = map[string]string{
 						"this-is-not-allowed": "?*&!@",
 						"toolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolong": "toolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolongtoolong",
 					}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(
 						PointTo(MatchFields(IgnoreExtras, Fields{
@@ -889,12 +896,12 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 
 			Context("volume types validation", func() {
 				It("should enforce uniqueness of volume type names", func() {
-					cloudProfile.Spec.VolumeTypes = []core.VolumeType{
-						cloudProfile.Spec.VolumeTypes[0],
-						cloudProfile.Spec.VolumeTypes[0],
+					privateCloudProfile.Spec.VolumeTypes = []core.VolumeType{
+						privateCloudProfile.Spec.VolumeTypes[0],
+						privateCloudProfile.Spec.VolumeTypes[0],
 					}
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeDuplicate),
@@ -903,9 +910,9 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 				})
 
 				It("should forbid volume types with unsupported property values", func() {
-					cloudProfile.Spec.VolumeTypes = invalidVolumeTypes
+					privateCloudProfile.Spec.VolumeTypes = invalidVolumeTypes
 
-					errorList := ValidatePrivateCloudProfile(cloudProfile)
+					errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 					Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 						"Type":  Equal(field.ErrorTypeRequired),
@@ -922,9 +929,9 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 			})
 
 			It("should forbid unsupported seed selectors", func() {
-				cloudProfile.Spec.SeedSelector.MatchLabels["foo"] = "no/slash/allowed"
+				privateCloudProfile.Spec.SeedSelector.MatchLabels["foo"] = "no/slash/allowed"
 
-				errorList := ValidatePrivateCloudProfile(cloudProfile)
+				errorList := ValidatePrivateCloudProfile(privateCloudProfile)
 
 				Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
 					"Type":  Equal(field.ErrorTypeInvalid),
@@ -946,6 +953,7 @@ var _ = Describe("PrivateCloudProfile Validation Tests ", func() {
 				ObjectMeta: metav1.ObjectMeta{
 					ResourceVersion: "dummy",
 					Name:            "dummy",
+					Namespace:       "dummy",
 				},
 				Spec: core.PrivateCloudProfileSpec{
 					Parent: "aws-profile",
