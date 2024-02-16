@@ -1852,12 +1852,13 @@ message OpenIDConnectClientAuthentication {
 // PrivateCloudProfile represents certain properties about a provider environment.
 message PrivateCloudProfile {
   // Standard object metadata.
-  // +optional
   optional k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 1;
 
   // Spec defines the provider environment properties.
-  // +optional
   optional PrivateCloudProfileSpec spec = 2;
+
+  // Most recently observed status of the PrivateCloudProfile
+  optional PrivateCloudProfileStatus status = 3;
 }
 
 // PrivateCloudProfileList is a collection of CloudProfiles.
@@ -1916,6 +1917,12 @@ message PrivateCloudProfileSpec {
   // A pointer to the PrivateCloudProfiles parent CloudProfile
   // +optional
   optional string parent = 10;
+}
+
+// PrivateCloudProfileStatus holds the most recently observed status of the project
+message PrivateCloudProfileStatus {
+  // CloudProfile is the most recently generated CloudProfile of the PrivateCloudProfile
+  optional CloudProfile cloudProfile = 1;
 }
 
 // Project holds certain properties about a Gardener project.

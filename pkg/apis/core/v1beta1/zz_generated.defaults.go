@@ -97,6 +97,7 @@ func SetObjectDefaults_PrivateCloudProfile(in *PrivateCloudProfile) {
 		a := &in.Spec.VolumeTypes[i]
 		SetDefaults_VolumeType(a)
 	}
+	SetObjectDefaults_CloudProfile(&in.Status.CloudProfile)
 }
 
 func SetObjectDefaults_PrivateCloudProfileList(in *PrivateCloudProfileList) {

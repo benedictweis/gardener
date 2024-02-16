@@ -275,6 +275,10 @@ BackupEntryStatus
 <h3 id="core.gardener.cloud/v1beta1.CloudProfile">CloudProfile
 </h3>
 <p>
+(<em>Appears on:</em>
+<a href="#core.gardener.cloud/v1beta1.PrivateCloudProfileStatus">PrivateCloudProfileStatus</a>)
+</p>
+<p>
 <p>CloudProfile represents certain properties about a provider environment.</p>
 </p>
 <table>
@@ -968,7 +972,6 @@ Kubernetes meta/v1.ObjectMeta
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Standard object metadata.</p>
 Refer to the Kubernetes API documentation for the fields of the
 <code>metadata</code> field.
@@ -984,7 +987,6 @@ PrivateCloudProfileSpec
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Spec defines the provider environment properties.</p>
 <br/>
 <br/>
@@ -1102,6 +1104,19 @@ string
 </td>
 </tr>
 </table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code></br>
+<em>
+<a href="#core.gardener.cloud/v1beta1.PrivateCloudProfileStatus">
+PrivateCloudProfileStatus
+</a>
+</em>
+</td>
+<td>
+<p>Most recently observed status of the PrivateCloudProfile</p>
 </td>
 </tr>
 </tbody>
@@ -8267,6 +8282,38 @@ string
 <td>
 <em>(Optional)</em>
 <p>A pointer to the PrivateCloudProfiles parent CloudProfile</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core.gardener.cloud/v1beta1.PrivateCloudProfileStatus">PrivateCloudProfileStatus
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#core.gardener.cloud/v1beta1.PrivateCloudProfile">PrivateCloudProfile</a>)
+</p>
+<p>
+<p>PrivateCloudProfileStatus holds the most recently observed status of the project</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>cloudProfile</code></br>
+<em>
+<a href="#core.gardener.cloud/v1beta1.CloudProfile">
+CloudProfile
+</a>
+</em>
+</td>
+<td>
+<p>CloudProfile is the most recently generated CloudProfile of the PrivateCloudProfile</p>
 </td>
 </tr>
 </tbody>

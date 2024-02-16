@@ -130,6 +130,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.PrivateCloudProfile":                        schema_pkg_apis_core_v1beta1_PrivateCloudProfile(ref),
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.PrivateCloudProfileList":                    schema_pkg_apis_core_v1beta1_PrivateCloudProfileList(ref),
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.PrivateCloudProfileSpec":                    schema_pkg_apis_core_v1beta1_PrivateCloudProfileSpec(ref),
+		"github.com/gardener/gardener/pkg/apis/core/v1beta1.PrivateCloudProfileStatus":                  schema_pkg_apis_core_v1beta1_PrivateCloudProfileStatus(ref),
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.Project":                                    schema_pkg_apis_core_v1beta1_Project(ref),
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.ProjectList":                                schema_pkg_apis_core_v1beta1_ProjectList(ref),
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.ProjectMember":                              schema_pkg_apis_core_v1beta1_ProjectMember(ref),
@@ -5451,11 +5452,18 @@ func schema_pkg_apis_core_v1beta1_PrivateCloudProfile(ref common.ReferenceCallba
 							Ref:         ref("github.com/gardener/gardener/pkg/apis/core/v1beta1.PrivateCloudProfileSpec"),
 						},
 					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Most recently observed status of the PrivateCloudProfile",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/gardener/gardener/pkg/apis/core/v1beta1.PrivateCloudProfileStatus"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/gardener/gardener/pkg/apis/core/v1beta1.PrivateCloudProfileSpec", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
+			"github.com/gardener/gardener/pkg/apis/core/v1beta1.PrivateCloudProfileSpec", "github.com/gardener/gardener/pkg/apis/core/v1beta1.PrivateCloudProfileStatus", "k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"},
 	}
 }
 
@@ -5629,6 +5637,28 @@ func schema_pkg_apis_core_v1beta1_PrivateCloudProfileSpec(ref common.ReferenceCa
 		},
 		Dependencies: []string{
 			"github.com/gardener/gardener/pkg/apis/core/v1beta1.KubernetesSettings", "github.com/gardener/gardener/pkg/apis/core/v1beta1.MachineImage", "github.com/gardener/gardener/pkg/apis/core/v1beta1.MachineType", "github.com/gardener/gardener/pkg/apis/core/v1beta1.Region", "github.com/gardener/gardener/pkg/apis/core/v1beta1.SeedSelector", "github.com/gardener/gardener/pkg/apis/core/v1beta1.VolumeType"},
+	}
+}
+
+func schema_pkg_apis_core_v1beta1_PrivateCloudProfileStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "PrivateCloudProfileStatus holds the most recently observed status of the project",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"cloudProfile": {
+						SchemaProps: spec.SchemaProps{
+							Description: "CloudProfile is the most recently generated CloudProfile of the PrivateCloudProfile",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/gardener/gardener/pkg/apis/core/v1beta1.CloudProfile"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"github.com/gardener/gardener/pkg/apis/core/v1beta1.CloudProfile"},
 	}
 }
 

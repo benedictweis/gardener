@@ -25,11 +25,11 @@ import (
 type PrivateCloudProfile struct {
 	metav1.TypeMeta
 	// Standard object metadata.
-	// +optional
 	metav1.ObjectMeta
 	// Spec defines the provider environment properties.
-	// +optional
 	Spec PrivateCloudProfileSpec
+	// Most recently observed status of the PrivateCloudProfile
+	Status PrivateCloudProfileStatus
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -38,7 +38,6 @@ type PrivateCloudProfile struct {
 type PrivateCloudProfileList struct {
 	metav1.TypeMeta
 	// Standard list object metadata.
-	// +optional
 	metav1.ListMeta
 	// Items is the list of CloudProfiles.
 	Items []PrivateCloudProfile
@@ -83,4 +82,10 @@ type PrivateCloudProfileSpec struct {
 	// A pointer to the PrivateCloudProfiles parent CloudProfile
 	// +optional
 	Parent string
+}
+
+// PrivateCloudProfileStatus holds the most recently observed status of the project
+type PrivateCloudProfileStatus struct {
+	// CloudProfile is the most recently generated CloudProfile of the PrivateCloudProfile
+	CloudProfile CloudProfile
 }

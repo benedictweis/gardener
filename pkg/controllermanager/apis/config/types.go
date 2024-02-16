@@ -63,6 +63,8 @@ type ControllerManagerControllerConfiguration struct {
 	Event *EventControllerConfiguration
 	// ExposureClass defines the configuration of the ExposureClass controller.
 	ExposureClass *ExposureClassControllerConfiguration
+	// PrivateCloudProfile defines the configuration of the PrivateCloudProfile controller.
+	PrivateCloudProfile *PrivateCloudProfileControllerConfiguration
 	// Project defines the configuration of the Project controller.
 	Project *ProjectControllerConfiguration
 	// Quota defines the configuration of the Quota controller.
@@ -148,6 +150,14 @@ type EventControllerConfiguration struct {
 // ExposureClassControllerConfiguration defines the configuration of the
 // ExposureClass controller.
 type ExposureClassControllerConfiguration struct {
+	// ConcurrentSyncs is the number of workers used for the controller to work on
+	// events.
+	ConcurrentSyncs *int
+}
+
+// PrivateCloudProfileControllerConfiguration defines the configuration of the CloudProfile
+// controller.
+type PrivateCloudProfileControllerConfiguration struct {
 	// ConcurrentSyncs is the number of workers used for the controller to work on
 	// events.
 	ConcurrentSyncs *int

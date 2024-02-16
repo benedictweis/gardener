@@ -25,11 +25,11 @@ import (
 type PrivateCloudProfile struct {
 	metav1.TypeMeta `json:",inline"`
 	// Standard object metadata.
-	// +optional
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 	// Spec defines the provider environment properties.
-	// +optional
 	Spec PrivateCloudProfileSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
+	// Most recently observed status of the PrivateCloudProfile
+	Status PrivateCloudProfileStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -83,4 +83,10 @@ type PrivateCloudProfileSpec struct {
 	// A pointer to the PrivateCloudProfiles parent CloudProfile
 	// +optional
 	Parent string `json:"parent" protobuf:"bytes,10,req,name=parent"`
+}
+
+// PrivateCloudProfileStatus holds the most recently observed status of the project
+type PrivateCloudProfileStatus struct {
+	// CloudProfile is the most recently generated CloudProfile of the PrivateCloudProfile
+	CloudProfile CloudProfile `json:"cloudProfile,omitempty" protobuf:"bytes,1,opt,name=cloudProfile"`
 }
