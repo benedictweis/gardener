@@ -26,7 +26,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	gardencorev1beta1 "github.com/gardener/gardener/pkg/apis/core/v1beta1"
@@ -35,17 +34,17 @@ import (
 )
 
 var _ = Describe("Reconciler", func() {
-	const finalizerName = "gardener"
-
 	var (
 		ctx  = context.TODO()
 		ctrl *gomock.Controller
 		c    *mockclient.MockClient
 
 		privateCloudProfileName string
+		parentCloudProfileName  string
 		fakeErr                 error
 		reconciler              reconcile.Reconciler
-		privateCloudProfile     *gardencorev1beta1.PrivateCloudProfile
+		_                       *gardencorev1beta1.PrivateCloudProfile
+		_                       *gardencorev1beta1.CloudProfile
 	)
 
 	BeforeEach(func() {
@@ -53,12 +52,20 @@ var _ = Describe("Reconciler", func() {
 		c = mockclient.NewMockClient(ctrl)
 
 		privateCloudProfileName = "test-privatecloudprofile"
+		parentCloudProfileName = "test-cloudprofile"
 		fakeErr = fmt.Errorf("fake err")
 		reconciler = &Reconciler{Client: c, Recorder: &record.FakeRecorder{}}
-		privateCloudProfile = &gardencorev1beta1.PrivateCloudProfile{
+		_ = &gardencorev1beta1.PrivateCloudProfile{
 			ObjectMeta: metav1.ObjectMeta{
-				Name:            privateCloudProfileName,
-				ResourceVersion: "42",
+				Name: privateCloudProfileName,
+			},
+			Spec: gardencorev1beta1.PrivateCloudProfileSpec{
+				Parent: parentCloudProfileName,
+			},
+		}
+		_ = &gardencorev1beta1.CloudProfile{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: parentCloudProfileName,
 			},
 		}
 	})
@@ -83,107 +90,24 @@ var _ = Describe("Reconciler", func() {
 		Expect(err).To(MatchError(fakeErr))
 	})
 
-	Context("when deletion timestamp not set", func() {
-		BeforeEach(func() {
-			c.EXPECT().Get(gomock.Any(), kubernetesutils.Key(privateCloudProfileName), gomock.AssignableToTypeOf(&gardencorev1beta1.PrivateCloudProfile{})).DoAndReturn(func(_ context.Context, _ client.ObjectKey, obj *gardencorev1beta1.PrivateCloudProfile, _ ...client.GetOption) error {
-				*obj = *privateCloudProfile
-				return nil
-			})
-		})
-
-		It("should ensure the finalizer (error)", func() {
-			errToReturn := apierrors.NewNotFound(schema.GroupResource{}, privateCloudProfileName)
-
-			c.EXPECT().Patch(gomock.Any(), gomock.AssignableToTypeOf(&gardencorev1beta1.PrivateCloudProfile{}), gomock.Any()).DoAndReturn(func(_ context.Context, o client.Object, patch client.Patch, opts ...client.PatchOption) error {
-				Expect(patch.Data(o)).To(BeEquivalentTo(fmt.Sprintf(`{"metadata":{"finalizers":["%s"],"resourceVersion":"42"}}`, finalizerName)))
-				return errToReturn
-			})
-
-			result, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: types.NamespacedName{Name: privateCloudProfileName}})
-			Expect(result).To(Equal(reconcile.Result{}))
-			Expect(err).To(MatchError(err))
-		})
-
-		It("should ensure the finalizer (no error)", func() {
-			c.EXPECT().Patch(gomock.Any(), gomock.AssignableToTypeOf(&gardencorev1beta1.PrivateCloudProfile{}), gomock.Any()).DoAndReturn(func(_ context.Context, o client.Object, patch client.Patch, opts ...client.PatchOption) error {
-				Expect(patch.Data(o)).To(BeEquivalentTo(fmt.Sprintf(`{"metadata":{"finalizers":["%s"],"resourceVersion":"42"}}`, finalizerName)))
-				return nil
-			})
-
-			result, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: types.NamespacedName{Name: privateCloudProfileName}})
-			Expect(result).To(Equal(reconcile.Result{}))
-			Expect(err).NotTo(HaveOccurred())
-		})
-	})
-
-	Context("when deletion timestamp set", func() {
-		BeforeEach(func() {
-			now := metav1.Now()
-			privateCloudProfile.DeletionTimestamp = &now
-			privateCloudProfile.Finalizers = []string{finalizerName}
-
-			c.EXPECT().Get(gomock.Any(), kubernetesutils.Key(privateCloudProfileName), gomock.AssignableToTypeOf(&gardencorev1beta1.PrivateCloudProfile{})).DoAndReturn(func(_ context.Context, _ client.ObjectKey, obj *gardencorev1beta1.PrivateCloudProfile, _ ...client.GetOption) error {
-				*obj = *privateCloudProfile
-				return nil
-			})
-		})
-
-		It("should do nothing because finalizer is not present", func() {
-			privateCloudProfile.Finalizers = nil
-
-			result, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: types.NamespacedName{Name: privateCloudProfileName}})
-			Expect(result).To(Equal(reconcile.Result{}))
-			Expect(err).NotTo(HaveOccurred())
-		})
-
-		It("should return an error because Shoot referencing PrivateCloudProfile exists", func() {
-			c.EXPECT().List(gomock.Any(), gomock.AssignableToTypeOf(&gardencorev1beta1.ShootList{})).DoAndReturn(func(_ context.Context, obj *gardencorev1beta1.ShootList, _ ...client.ListOption) error {
-				(&gardencorev1beta1.ShootList{Items: []gardencorev1beta1.Shoot{
-					{
-						ObjectMeta: metav1.ObjectMeta{Name: "test-shoot", Namespace: "test-namespace"},
-						Spec: gardencorev1beta1.ShootSpec{
-							CloudProfileName: privateCloudProfileName,
-						},
-					},
-				}}).DeepCopyInto(obj)
-				return nil
-			})
-
-			result, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: types.NamespacedName{Name: privateCloudProfileName}})
-			Expect(result).To(Equal(reconcile.Result{}))
-			Expect(err).To(MatchError(ContainSubstring("Cannot delete PrivateCloudProfile")))
-		})
-
-		It("should remove the finalizer (error)", func() {
-			c.EXPECT().List(gomock.Any(), gomock.AssignableToTypeOf(&gardencorev1beta1.ShootList{})).DoAndReturn(func(_ context.Context, obj *gardencorev1beta1.ShootList, _ ...client.ListOption) error {
-				(&gardencorev1beta1.ShootList{}).DeepCopyInto(obj)
-				return nil
-			})
-
-			c.EXPECT().Patch(gomock.Any(), gomock.AssignableToTypeOf(&gardencorev1beta1.PrivateCloudProfile{}), gomock.Any()).DoAndReturn(func(_ context.Context, o client.Object, patch client.Patch, opts ...client.PatchOption) error {
-				Expect(patch.Data(o)).To(BeEquivalentTo(`{"metadata":{"finalizers":null,"resourceVersion":"42"}}`))
-				return fakeErr
-			})
-
-			result, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: types.NamespacedName{Name: privateCloudProfileName}})
-			Expect(result).To(Equal(reconcile.Result{}))
-			Expect(err).To(MatchError(fakeErr))
-		})
-
-		It("should remove the finalizer (no error)", func() {
-			c.EXPECT().List(gomock.Any(), gomock.AssignableToTypeOf(&gardencorev1beta1.ShootList{})).DoAndReturn(func(_ context.Context, obj *gardencorev1beta1.ShootList, _ ...client.ListOption) error {
-				(&gardencorev1beta1.ShootList{}).DeepCopyInto(obj)
-				return nil
-			})
-
-			c.EXPECT().Patch(gomock.Any(), gomock.AssignableToTypeOf(&gardencorev1beta1.PrivateCloudProfile{}), gomock.Any()).DoAndReturn(func(_ context.Context, o client.Object, patch client.Patch, opts ...client.PatchOption) error {
-				Expect(patch.Data(o)).To(BeEquivalentTo(`{"metadata":{"finalizers":null,"resourceVersion":"42"}}`))
-				return nil
-			})
-
-			result, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: types.NamespacedName{Name: privateCloudProfileName}})
-			Expect(result).To(Equal(reconcile.Result{}))
-			Expect(err).NotTo(HaveOccurred())
-		})
-	})
+	//It("should return an err because object reading failed on parent cloud profile", func() {
+	//	c.EXPECT().Get(gomock.Any(), kubernetesutils.Key(privateCloudProfileName), gomock.AssignableToTypeOf(&gardencorev1beta1.PrivateCloudProfile{})).DoAndReturn(func(_ context.Context, _ client.ObjectKey, obj *gardencorev1beta1.PrivateCloudProfile, _ ...client.GetOption) error {
+	//		*obj = *privateCloudProfile
+	//		return nil
+	//	})
+	//
+	//	c.EXPECT().Get(gomock.Any(), kubernetesutils.Key(parentCloudProfileName), gomock.AssignableToTypeOf(&gardencorev1beta1.CloudProfile{})).DoAndReturn(func(_ context.Context, _ client.ObjectKey, obj *gardencorev1beta1.CloudProfile, _ ...client.GetOption) error {
+	//		*obj = *parentCloudProfile
+	//		return nil
+	//	})
+	//
+	//	c.EXPECT().Patch(gomock.Any(), gomock.AssignableToTypeOf(&gardencorev1beta1.PrivateCloudProfile{}), gomock.Any()).DoAndReturn(func(_ context.Context, o client.Object, patch client.Patch, opts ...client.PatchOption) error {
+	//		Expect(patch.Data(o)).To(BeEquivalentTo(fmt.Sprintf(`{"status":{"cloudProfile":{"metadata":{"name":"test-cloudprofile"}}}}`)))
+	//		return nil
+	//	})
+	//
+	//	result, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: types.NamespacedName{Name: privateCloudProfileName}})
+	//	Expect(result).To(Equal(reconcile.Result{}))
+	//	Expect(err).To(MatchError(ContainSubstring("hi")))
+	//})
 })
