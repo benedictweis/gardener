@@ -134,6 +134,19 @@ var _ = Describe("Admission", func() {
 
 			Expect(admissionHandler.Validate(ctx, attrs, nil)).To(Succeed())
 		})
+
+		It("should allow creating a PrivateCloudProfile that defines a different machineType than the parent CloudProfile", func() {
+			Expect(coreInformerFactory.Core().InternalVersion().CloudProfiles().Informer().GetStore().Add(&parentCloudProfile)).To(Succeed())
+
+			privateCloudProfile.Spec.Parent = parentCloudProfileName
+			privateCloudProfile.Spec.MachineTypes = []core.MachineType{{Name: "my-other-machine"}}
+
+			parentCloudProfile.Spec.MachineTypes = []core.MachineType{machineType}
+
+			attrs := admission.NewAttributesRecord(&privateCloudProfile, nil, core.Kind("PrivateCloudProfile").WithVersion("version"), "", privateCloudProfile.Name, core.Resource("privatecloudprofile").WithVersion("version"), "", admission.Create, &metav1.CreateOptions{}, false, nil)
+
+			Expect(admissionHandler.Validate(ctx, attrs, nil)).To(Succeed())
+		})
 	})
 
 	Describe("#Register", func() {

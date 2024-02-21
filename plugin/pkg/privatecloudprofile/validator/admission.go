@@ -158,7 +158,7 @@ func (c *validationContext) validateMachineTypes(a admission.Attributes) error {
 	}
 
 	// TODO this does not feel very clean
-	for _, machineType := range c.parentCloudProfile.Spec.MachineTypes {
+	for _, machineType := range c.privateCloudProfile.Spec.MachineTypes {
 	parentMachineTypesLoop:
 		for _, parentMachineType := range c.parentCloudProfile.Spec.MachineTypes {
 			if parentMachineType.Name != machineType.Name {
