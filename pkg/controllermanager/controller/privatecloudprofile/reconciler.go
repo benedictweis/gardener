@@ -20,6 +20,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/tools/record"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -118,6 +119,8 @@ func patchCloudProfileStatus(ctx context.Context, c client.Client, privateCloudP
 }
 
 func mergeCloudProfiles(parentCloudProfile *gardencorev1beta1.CloudProfile, privateCloudProfile *gardencorev1beta1.PrivateCloudProfile) {
+	parentCloudProfile.ObjectMeta = metav1.ObjectMeta{Name: parentCloudProfile.Name}
+	parentCloudProfile.ObjectMeta.CreationTimestamp = metav1.Now()
 	if privateCloudProfile.Spec.Kubernetes != nil {
 		parentCloudProfile.Spec.Kubernetes.Versions = append(parentCloudProfile.Spec.Kubernetes.Versions, privateCloudProfile.Spec.Kubernetes.Versions...)
 	}
@@ -129,6 +132,5 @@ func mergeCloudProfiles(parentCloudProfile *gardencorev1beta1.CloudProfile, priv
 		mergedCABundles := fmt.Sprintf("%s%s", *parentCloudProfile.Spec.CABundle, *privateCloudProfile.Spec.CABundle)
 		parentCloudProfile.Spec.CABundle = &mergedCABundles
 	}
-	// TODO how to merge seedSelector
-	// TODO Should metadata also be merged?
+	// TODO how to merge seedSelector?
 }

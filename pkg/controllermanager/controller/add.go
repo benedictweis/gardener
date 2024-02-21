@@ -96,7 +96,7 @@ func AddToManager(ctx context.Context, mgr manager.Manager, cfg *config.Controll
 
 	if err := (&privatecloudprofile.Reconciler{
 		Config: *cfg.Controllers.PrivateCloudProfile,
-	}).AddToManager(mgr); err != nil {
+	}).AddToManager(ctx, mgr); err != nil {
 		return fmt.Errorf("failed adding PrivateCloudProfile controller: %w", err)
 	}
 
