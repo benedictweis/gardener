@@ -69,14 +69,15 @@ func Register(plugins *admission.Plugins) {
 // ValidateShoot contains listers and admission handler.
 type ValidateShoot struct {
 	*admission.Handler
-	authorizer          authorizer.Authorizer
-	secretLister        kubecorev1listers.SecretLister
-	cloudProfileLister  gardencorelisters.CloudProfileLister
-	seedLister          gardencorelisters.SeedLister
-	shootLister         gardencorelisters.ShootLister
-	projectLister       gardencorelisters.ProjectLister
-	secretBindingLister gardencorelisters.SecretBindingLister
-	readyFunc           admission.ReadyFunc
+	authorizer                authorizer.Authorizer
+	secretLister              kubecorev1listers.SecretLister
+	cloudProfileLister        gardencorelisters.CloudProfileLister
+	seedLister                gardencorelisters.SeedLister
+	shootLister               gardencorelisters.ShootLister
+	privateCloudProfileLister gardencorelisters.PrivateCloudProfileLister
+	projectLister             gardencorelisters.ProjectLister
+	secretBindingLister       gardencorelisters.SecretBindingLister
+	readyFunc                 admission.ReadyFunc
 }
 
 var (
@@ -116,6 +117,9 @@ func (v *ValidateShoot) SetInternalCoreInformerFactory(f gardencoreinformers.Sha
 	cloudProfileInformer := f.Core().InternalVersion().CloudProfiles()
 	v.cloudProfileLister = cloudProfileInformer.Lister()
 
+	privateCloudProfileInformer := f.Core().InternalVersion().PrivateCloudProfiles()
+	v.privateCloudProfileLister = privateCloudProfileInformer.Lister()
+
 	projectInformer := f.Core().InternalVersion().Projects()
 	v.projectLister = projectInformer.Lister()
 
@@ -127,6 +131,7 @@ func (v *ValidateShoot) SetInternalCoreInformerFactory(f gardencoreinformers.Sha
 		seedInformer.Informer().HasSynced,
 		shootInformer.Informer().HasSynced,
 		cloudProfileInformer.Informer().HasSynced,
+		privateCloudProfileInformer.Informer().HasSynced,
 		projectInformer.Informer().HasSynced,
 		secretBindingInformer.Informer().HasSynced,
 	)
@@ -156,6 +161,9 @@ func (v *ValidateShoot) ValidateInitialization() error {
 	}
 	if v.shootLister == nil {
 		return errors.New("missing shoot lister")
+	}
+	if v.privateCloudProfileLister == nil {
+		return errors.New("missing privateCloudProfile lister")
 	}
 	if v.projectLister == nil {
 		return errors.New("missing project lister")
@@ -234,9 +242,9 @@ func (v *ValidateShoot) Admit(ctx context.Context, a admission.Attributes, _ adm
 		}
 	}
 
-	cloudProfile, err := v.cloudProfileLister.Get(shoot.Spec.CloudProfileName)
+	cloudProfile, err := admissionutils.GetCloudProfile(shoot.Spec.CloudProfileName, v.cloudProfileLister, v.privateCloudProfileLister, shoot.Namespace)
 	if err != nil {
-		return apierrors.NewInternalError(fmt.Errorf("could not find referenced cloud profile: %+v", err.Error()))
+		return apierrors.NewInternalError(fmt.Errorf("could not find referenced (private) cloud profile: %+v", err.Error()))
 	}
 
 	var seed *core.Seed

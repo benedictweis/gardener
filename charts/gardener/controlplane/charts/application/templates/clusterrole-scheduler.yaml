@@ -42,6 +42,7 @@ rules:
   resources:
   - seeds
   - cloudprofiles
+  - privatecloudprofiles
   verbs:
   - get
   - list

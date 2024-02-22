@@ -119,7 +119,7 @@ func patchCloudProfileStatus(ctx context.Context, c client.Client, privateCloudP
 }
 
 func mergeCloudProfiles(parentCloudProfile *gardencorev1beta1.CloudProfile, privateCloudProfile *gardencorev1beta1.PrivateCloudProfile) {
-	parentCloudProfile.ObjectMeta = metav1.ObjectMeta{Name: parentCloudProfile.Name}
+	parentCloudProfile.ObjectMeta = metav1.ObjectMeta{Name: privateCloudProfile.Name}
 	parentCloudProfile.ObjectMeta.CreationTimestamp = metav1.Now()
 	if privateCloudProfile.Spec.Kubernetes != nil {
 		parentCloudProfile.Spec.Kubernetes.Versions = append(parentCloudProfile.Spec.Kubernetes.Versions, privateCloudProfile.Spec.Kubernetes.Versions...)

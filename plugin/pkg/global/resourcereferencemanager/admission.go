@@ -76,6 +76,7 @@ type ReferenceManager struct {
 	seedLister                 gardencorelisters.SeedLister
 	shootLister                gardencorelisters.ShootLister
 	secretBindingLister        gardencorelisters.SecretBindingLister
+	privateCloudProfileLister  gardencorelisters.PrivateCloudProfileLister
 	projectLister              gardencorelisters.ProjectLister
 	quotaLister                gardencorelisters.QuotaLister
 	controllerDeploymentLister gardencorelisters.ControllerDeploymentLister
@@ -136,6 +137,9 @@ func (r *ReferenceManager) SetInternalCoreInformerFactory(f gardencoreinformers.
 	quotaInformer := f.Core().InternalVersion().Quotas()
 	r.quotaLister = quotaInformer.Lister()
 
+	privateCloudProfileLister := f.Core().InternalVersion().PrivateCloudProfiles()
+	r.privateCloudProfileLister = privateCloudProfileLister.Lister()
+
 	projectInformer := f.Core().InternalVersion().Projects()
 	r.projectLister = projectInformer.Lister()
 
@@ -152,6 +156,7 @@ func (r *ReferenceManager) SetInternalCoreInformerFactory(f gardencoreinformers.
 		cloudProfileInformer.Informer().HasSynced,
 		secretBindingInformer.Informer().HasSynced,
 		quotaInformer.Informer().HasSynced,
+		privateCloudProfileLister.Informer().HasSynced,
 		projectInformer.Informer().HasSynced,
 		controllerDeploymentInformer.Informer().HasSynced,
 		exposureClassInformer.Informer().HasSynced)
@@ -211,6 +216,9 @@ func (r *ReferenceManager) ValidateInitialization() error {
 	}
 	if r.quotaLister == nil {
 		return errors.New("missing quota lister")
+	}
+	if r.privateCloudProfileLister == nil {
+		return errors.New("missing private cloud profile lister")
 	}
 	if r.projectLister == nil {
 		return errors.New("missing project lister")
@@ -610,8 +618,8 @@ func (r *ReferenceManager) ensureSecretBindingReferences(ctx context.Context, at
 
 func (r *ReferenceManager) ensureShootReferences(ctx context.Context, attributes admission.Attributes, oldShoot, shoot *core.Shoot) error {
 	if !equality.Semantic.DeepEqual(oldShoot.Spec.CloudProfileName, shoot.Spec.CloudProfileName) {
-		if _, err := r.cloudProfileLister.Get(shoot.Spec.CloudProfileName); err != nil {
-			return err
+		if _, err := utils.GetCloudProfile(shoot.Spec.CloudProfileName, r.cloudProfileLister, r.privateCloudProfileLister, shoot.Namespace); err != nil {
+			return fmt.Errorf("could not find referenced (private) cloud profile when ensuring shoot references: %+v", err.Error())
 		}
 	}
 

@@ -37,6 +37,7 @@ import (
 	gardencorelisters "github.com/gardener/gardener/pkg/client/core/listers/core/internalversion"
 	timeutils "github.com/gardener/gardener/pkg/utils/time"
 	plugin "github.com/gardener/gardener/plugin/pkg"
+	"github.com/gardener/gardener/plugin/pkg/utils"
 )
 
 var (
@@ -59,12 +60,13 @@ func Register(plugins *admission.Plugins) {
 // QuotaValidator contains listers and admission handler.
 type QuotaValidator struct {
 	*admission.Handler
-	shootLister         gardencorelisters.ShootLister
-	cloudProfileLister  gardencorelisters.CloudProfileLister
-	secretBindingLister gardencorelisters.SecretBindingLister
-	quotaLister         gardencorelisters.QuotaLister
-	readyFunc           admission.ReadyFunc
-	time                timeutils.Ops
+	shootLister               gardencorelisters.ShootLister
+	cloudProfileLister        gardencorelisters.CloudProfileLister
+	privateCloudProfileLister gardencorelisters.PrivateCloudProfileLister
+	secretBindingLister       gardencorelisters.SecretBindingLister
+	quotaLister               gardencorelisters.QuotaLister
+	readyFunc                 admission.ReadyFunc
+	time                      timeutils.Ops
 }
 
 var (
@@ -95,6 +97,9 @@ func (q *QuotaValidator) SetInternalCoreInformerFactory(f gardencoreinformers.Sh
 	cloudProfileInformer := f.Core().InternalVersion().CloudProfiles()
 	q.cloudProfileLister = cloudProfileInformer.Lister()
 
+	privateCloudProfileLister := f.Core().InternalVersion().PrivateCloudProfiles()
+	q.privateCloudProfileLister = privateCloudProfileLister.Lister()
+
 	secretBindingInformer := f.Core().InternalVersion().SecretBindings()
 	q.secretBindingLister = secretBindingInformer.Lister()
 
@@ -111,6 +116,9 @@ func (q *QuotaValidator) ValidateInitialization() error {
 	}
 	if q.cloudProfileLister == nil {
 		return errors.New("missing cloudProfile lister")
+	}
+	if q.privateCloudProfileLister == nil {
+		return errors.New("missing privateCloudProfile lister")
 	}
 	if q.secretBindingLister == nil {
 		return errors.New("missing secretBinding lister")
@@ -346,7 +354,7 @@ func (q *QuotaValidator) determineRequiredResources(allocatedResources corev1.Re
 }
 
 func (q *QuotaValidator) getShootResources(shoot core.Shoot) (corev1.ResourceList, error) {
-	cloudProfile, err := q.cloudProfileLister.Get(shoot.Spec.CloudProfileName)
+	cloudProfile, err := utils.GetCloudProfile(shoot.Spec.CloudProfileName, q.cloudProfileLister, q.privateCloudProfileLister, shoot.Namespace)
 	if err != nil {
 		return nil, apierrors.NewInternalError(fmt.Errorf("could not find referenced cloud profile: %+v", err.Error()))
 	}
