@@ -384,8 +384,8 @@ build:
             - pkg/registry/core/exposureclass/storage
             - pkg/registry/core/internalsecret
             - pkg/registry/core/internalsecret/storage
-            - pkg/registry/core/privatecloudprofile
-            - pkg/registry/core/privatecloudprofile/storage
+            - pkg/registry/core/namespacedcloudprofile
+            - pkg/registry/core/namespacedcloudprofile/storage
             - pkg/registry/core/project
             - pkg/registry/core/project/storage
             - pkg/registry/core/quota
@@ -440,7 +440,7 @@ build:
             - plugin/pkg/global/resourcereferencemanager
             - plugin/pkg/managedseed/shoot
             - plugin/pkg/managedseed/validator
-            - plugin/pkg/privatecloudprofile/validator
+            - plugin/pkg/namespacedcloudprofile/validator
             - plugin/pkg/project/validator
             - plugin/pkg/seed/validator
             - plugin/pkg/shoot/dns
@@ -522,7 +522,7 @@ build:
             - pkg/controllermanager/controller/event
             - pkg/controllermanager/controller/exposureclass
             - pkg/controllermanager/controller/managedseedset
-            - pkg/controllermanager/controller/privatecloudprofile
+            - pkg/controllermanager/controller/namespacedcloudprofile
             - pkg/controllermanager/controller/project
             - pkg/controllermanager/controller/project/activity
             - pkg/controllermanager/controller/project/project

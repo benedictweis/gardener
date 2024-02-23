@@ -73,9 +73,9 @@ type ControllerManagerControllerConfiguration struct {
 	// ExposureClass defines the configuration of the ExposureClass controller.
 	// +optional
 	ExposureClass *ExposureClassControllerConfiguration `json:"exposureClass,omitempty"`
-	// PrivateCloudProfile defines the configuration of the PrivateCloudProfile controller.
+	// NamespacedCloudProfile defines the configuration of the NamespacedCloudProfile controller.
 	// +optional
-	PrivateCloudProfile *PrivateCloudProfileControllerConfiguration `json:"privateCloudProfile,omitempty"`
+	NamespacedCloudProfile *NamespacedCloudProfileControllerConfiguration `json:"namespacedCloudProfile,omitempty"`
 	// Project defines the configuration of the Project controller.
 	// +optional
 	Project *ProjectControllerConfiguration `json:"project,omitempty"`
@@ -187,9 +187,9 @@ type ExposureClassControllerConfiguration struct {
 	ConcurrentSyncs *int `json:"concurrentSyncs,omitempty"`
 }
 
-// PrivateCloudProfileControllerConfiguration defines the configuration of the CloudProfile
+// NamespacedCloudProfileControllerConfiguration defines the configuration of the CloudProfile
 // controller.
-type PrivateCloudProfileControllerConfiguration struct {
+type NamespacedCloudProfileControllerConfiguration struct {
 	// ConcurrentSyncs is the number of workers used for the controller to work on
 	// events.
 	ConcurrentSyncs *int `json:"concurrentSyncs,omitempty"`

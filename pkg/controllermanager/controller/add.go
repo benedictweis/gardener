@@ -30,7 +30,7 @@ import (
 	"github.com/gardener/gardener/pkg/controllermanager/controller/event"
 	"github.com/gardener/gardener/pkg/controllermanager/controller/exposureclass"
 	"github.com/gardener/gardener/pkg/controllermanager/controller/managedseedset"
-	"github.com/gardener/gardener/pkg/controllermanager/controller/privatecloudprofile"
+	"github.com/gardener/gardener/pkg/controllermanager/controller/namespacedcloudprofile"
 	"github.com/gardener/gardener/pkg/controllermanager/controller/project"
 	"github.com/gardener/gardener/pkg/controllermanager/controller/quota"
 	"github.com/gardener/gardener/pkg/controllermanager/controller/secretbinding"
@@ -94,10 +94,10 @@ func AddToManager(ctx context.Context, mgr manager.Manager, cfg *config.Controll
 		return fmt.Errorf("failed adding ManagedSeedSet controller: %w", err)
 	}
 
-	if err := (&privatecloudprofile.Reconciler{
-		Config: *cfg.Controllers.PrivateCloudProfile,
+	if err := (&namespacedcloudprofile.Reconciler{
+		Config: *cfg.Controllers.NamespacedCloudProfile,
 	}).AddToManager(ctx, mgr); err != nil {
-		return fmt.Errorf("failed adding PrivateCloudProfile controller: %w", err)
+		return fmt.Errorf("failed adding NamespacedCloudProfile controller: %w", err)
 	}
 
 	if err := project.AddToManager(ctx, mgr, *cfg); err != nil {

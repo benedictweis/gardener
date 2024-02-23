@@ -22,7 +22,7 @@ type ExposureClassExpansion interface{}
 
 type InternalSecretExpansion interface{}
 
-type PrivateCloudProfileExpansion interface{}
+type NamespacedCloudProfileExpansion interface{}
 
 type ProjectExpansion interface{}
 

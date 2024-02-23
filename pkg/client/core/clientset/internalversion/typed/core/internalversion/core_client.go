@@ -23,7 +23,7 @@ type CoreInterface interface {
 	ControllerRegistrationsGetter
 	ExposureClassesGetter
 	InternalSecretsGetter
-	PrivateCloudProfilesGetter
+	NamespacedCloudProfilesGetter
 	ProjectsGetter
 	QuotasGetter
 	SecretBindingsGetter
@@ -69,8 +69,8 @@ func (c *CoreClient) InternalSecrets(namespace string) InternalSecretInterface {
 	return newInternalSecrets(c, namespace)
 }
 
-func (c *CoreClient) PrivateCloudProfiles(namespace string) PrivateCloudProfileInterface {
-	return newPrivateCloudProfiles(c, namespace)
+func (c *CoreClient) NamespacedCloudProfiles(namespace string) NamespacedCloudProfileInterface {
+	return newNamespacedCloudProfiles(c, namespace)
 }
 
 func (c *CoreClient) Projects() ProjectInterface {

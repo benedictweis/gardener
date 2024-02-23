@@ -37,7 +37,7 @@ import (
 	v1beta1helper "github.com/gardener/gardener/pkg/apis/core/v1beta1/helper"
 	"github.com/gardener/gardener/pkg/controllerutils"
 	"github.com/gardener/gardener/pkg/scheduler/apis/config"
-	gardenerurils "github.com/gardener/gardener/pkg/utils/gardener"
+	gardenerutils "github.com/gardener/gardener/pkg/utils/gardener"
 	cidrvalidation "github.com/gardener/gardener/pkg/utils/validation/cidr"
 )
 
@@ -138,7 +138,7 @@ func (r *Reconciler) determineSeed(
 	if err := r.Client.List(ctx, shootList); err != nil {
 		return nil, err
 	}
-	cloudProfile, err := gardenerurils.GetCloudProfile(ctx, r.Client, shoot.Spec.CloudProfileName, shoot.Namespace)
+	cloudProfile, err := gardenerutils.GetCloudProfile(ctx, r.Client, shoot.Spec.CloudProfileName, shoot.Namespace)
 	if err != nil {
 		return nil, err
 	}

@@ -21,8 +21,8 @@ func RegisterDefaults(scheme *runtime.Scheme) error {
 	scheme.AddTypeDefaultingFunc(&CloudProfileList{}, func(obj interface{}) { SetObjectDefaults_CloudProfileList(obj.(*CloudProfileList)) })
 	scheme.AddTypeDefaultingFunc(&ControllerRegistration{}, func(obj interface{}) { SetObjectDefaults_ControllerRegistration(obj.(*ControllerRegistration)) })
 	scheme.AddTypeDefaultingFunc(&ControllerRegistrationList{}, func(obj interface{}) { SetObjectDefaults_ControllerRegistrationList(obj.(*ControllerRegistrationList)) })
-	scheme.AddTypeDefaultingFunc(&PrivateCloudProfile{}, func(obj interface{}) { SetObjectDefaults_PrivateCloudProfile(obj.(*PrivateCloudProfile)) })
-	scheme.AddTypeDefaultingFunc(&PrivateCloudProfileList{}, func(obj interface{}) { SetObjectDefaults_PrivateCloudProfileList(obj.(*PrivateCloudProfileList)) })
+	scheme.AddTypeDefaultingFunc(&NamespacedCloudProfile{}, func(obj interface{}) { SetObjectDefaults_NamespacedCloudProfile(obj.(*NamespacedCloudProfile)) })
+	scheme.AddTypeDefaultingFunc(&NamespacedCloudProfileList{}, func(obj interface{}) { SetObjectDefaults_NamespacedCloudProfileList(obj.(*NamespacedCloudProfileList)) })
 	scheme.AddTypeDefaultingFunc(&Project{}, func(obj interface{}) { SetObjectDefaults_Project(obj.(*Project)) })
 	scheme.AddTypeDefaultingFunc(&ProjectList{}, func(obj interface{}) { SetObjectDefaults_ProjectList(obj.(*ProjectList)) })
 	scheme.AddTypeDefaultingFunc(&SecretBinding{}, func(obj interface{}) { SetObjectDefaults_SecretBinding(obj.(*SecretBinding)) })
@@ -80,7 +80,7 @@ func SetObjectDefaults_ControllerRegistrationList(in *ControllerRegistrationList
 	}
 }
 
-func SetObjectDefaults_PrivateCloudProfile(in *PrivateCloudProfile) {
+func SetObjectDefaults_NamespacedCloudProfile(in *NamespacedCloudProfile) {
 	for i := range in.Spec.MachineImages {
 		a := &in.Spec.MachineImages[i]
 		SetDefaults_MachineImage(a)
@@ -100,10 +100,10 @@ func SetObjectDefaults_PrivateCloudProfile(in *PrivateCloudProfile) {
 	SetObjectDefaults_CloudProfile(&in.Status.CloudProfile)
 }
 
-func SetObjectDefaults_PrivateCloudProfileList(in *PrivateCloudProfileList) {
+func SetObjectDefaults_NamespacedCloudProfileList(in *NamespacedCloudProfileList) {
 	for i := range in.Items {
 		a := &in.Items[i]
-		SetObjectDefaults_PrivateCloudProfile(a)
+		SetObjectDefaults_NamespacedCloudProfile(a)
 	}
 }
 

@@ -42,8 +42,8 @@ const (
 	PluginNameManagedSeedShoot = "ManagedSeedShoot"
 	// PluginNameManagedSeed is the name of the ManagedSeed admission plugin.
 	PluginNameManagedSeed = "ManagedSeed"
-	// PluginNamePrivateCloudProfileValidator is the name of the PrivateCloudProfile admission plugin.
-	PluginNamePrivateCloudProfileValidator = "PrivateCloudProfileValidator"
+	// PluginNameNamespacedCloudProfileValidator is the name of the NamespacedCloudProfile admission plugin.
+	PluginNameNamespacedCloudProfileValidator = "NamespacedCloudProfileValidator"
 	// PluginNameProjectValidator is the name of the ProjectValidator admission plugin.
 	PluginNameProjectValidator = "ProjectValidator"
 	// PluginNameSeedValidator is the name of the SeedValidator admission plugin.
@@ -89,7 +89,7 @@ func AllPluginNames() []string {
 		PluginNameShootValidator,                    // ShootValidator
 		PluginNameSeedValidator,                     // SeedValidator
 		PluginNameControllerRegistrationResources,   // ControllerRegistrationResources
-		PluginNamePrivateCloudProfileValidator,      // PrivateCloudProfileValidator
+		PluginNameNamespacedCloudProfileValidator,   // NamespacedCloudProfileValidator
 		PluginNameProjectValidator,                  // ProjectValidator
 		PluginNameDeletionConfirmation,              // DeletionConfirmation
 		PluginNameOpenIDConnectPreset,               // OpenIDConnectPreset
@@ -128,7 +128,7 @@ func DefaultOnPlugins() sets.Set[string] {
 		PluginNameShootValidator,                  // ShootValidator
 		PluginNameSeedValidator,                   // SeedValidator
 		PluginNameControllerRegistrationResources, // ControllerRegistrationResources
-		PluginNamePrivateCloudProfileValidator,    // PrivateCloudProfileValidator
+		PluginNameNamespacedCloudProfileValidator, // NamespacedCloudProfileValidator
 		PluginNameProjectValidator,                // ProjectValidator
 		PluginNameDeletionConfirmation,            // DeletionConfirmation
 		PluginNameOpenIDConnectPreset,             // OpenIDConnectPreset

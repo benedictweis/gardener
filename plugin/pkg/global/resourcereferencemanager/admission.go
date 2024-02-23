@@ -65,23 +65,23 @@ func Register(plugins *admission.Plugins) {
 // ReferenceManager contains listers and admission handler.
 type ReferenceManager struct {
 	*admission.Handler
-	gardenCoreClient           internalversion.Interface
-	kubeClient                 kubernetes.Interface
-	dynamicClient              dynamic.Interface
-	authorizer                 authorizer.Authorizer
-	secretLister               kubecorev1listers.SecretLister
-	configMapLister            kubecorev1listers.ConfigMapLister
-	backupBucketLister         gardencorelisters.BackupBucketLister
-	cloudProfileLister         gardencorelisters.CloudProfileLister
-	seedLister                 gardencorelisters.SeedLister
-	shootLister                gardencorelisters.ShootLister
-	secretBindingLister        gardencorelisters.SecretBindingLister
-	privateCloudProfileLister  gardencorelisters.PrivateCloudProfileLister
-	projectLister              gardencorelisters.ProjectLister
-	quotaLister                gardencorelisters.QuotaLister
-	controllerDeploymentLister gardencorelisters.ControllerDeploymentLister
-	exposureClassLister        gardencorelisters.ExposureClassLister
-	readyFunc                  admission.ReadyFunc
+	gardenCoreClient             internalversion.Interface
+	kubeClient                   kubernetes.Interface
+	dynamicClient                dynamic.Interface
+	authorizer                   authorizer.Authorizer
+	secretLister                 kubecorev1listers.SecretLister
+	configMapLister              kubecorev1listers.ConfigMapLister
+	backupBucketLister           gardencorelisters.BackupBucketLister
+	cloudProfileLister           gardencorelisters.CloudProfileLister
+	seedLister                   gardencorelisters.SeedLister
+	shootLister                  gardencorelisters.ShootLister
+	secretBindingLister          gardencorelisters.SecretBindingLister
+	namespacedCloudProfileLister gardencorelisters.NamespacedCloudProfileLister
+	projectLister                gardencorelisters.ProjectLister
+	quotaLister                  gardencorelisters.QuotaLister
+	controllerDeploymentLister   gardencorelisters.ControllerDeploymentLister
+	exposureClassLister          gardencorelisters.ExposureClassLister
+	readyFunc                    admission.ReadyFunc
 }
 
 var (
@@ -137,8 +137,8 @@ func (r *ReferenceManager) SetInternalCoreInformerFactory(f gardencoreinformers.
 	quotaInformer := f.Core().InternalVersion().Quotas()
 	r.quotaLister = quotaInformer.Lister()
 
-	privateCloudProfileLister := f.Core().InternalVersion().PrivateCloudProfiles()
-	r.privateCloudProfileLister = privateCloudProfileLister.Lister()
+	namespacedCloudProfileLister := f.Core().InternalVersion().NamespacedCloudProfiles()
+	r.namespacedCloudProfileLister = namespacedCloudProfileLister.Lister()
 
 	projectInformer := f.Core().InternalVersion().Projects()
 	r.projectLister = projectInformer.Lister()
@@ -156,7 +156,7 @@ func (r *ReferenceManager) SetInternalCoreInformerFactory(f gardencoreinformers.
 		cloudProfileInformer.Informer().HasSynced,
 		secretBindingInformer.Informer().HasSynced,
 		quotaInformer.Informer().HasSynced,
-		privateCloudProfileLister.Informer().HasSynced,
+		namespacedCloudProfileLister.Informer().HasSynced,
 		projectInformer.Informer().HasSynced,
 		controllerDeploymentInformer.Informer().HasSynced,
 		exposureClassInformer.Informer().HasSynced)
@@ -217,7 +217,7 @@ func (r *ReferenceManager) ValidateInitialization() error {
 	if r.quotaLister == nil {
 		return errors.New("missing quota lister")
 	}
-	if r.privateCloudProfileLister == nil {
+	if r.namespacedCloudProfileLister == nil {
 		return errors.New("missing private cloud profile lister")
 	}
 	if r.projectLister == nil {
@@ -618,7 +618,7 @@ func (r *ReferenceManager) ensureSecretBindingReferences(ctx context.Context, at
 
 func (r *ReferenceManager) ensureShootReferences(ctx context.Context, attributes admission.Attributes, oldShoot, shoot *core.Shoot) error {
 	if !equality.Semantic.DeepEqual(oldShoot.Spec.CloudProfileName, shoot.Spec.CloudProfileName) {
-		if _, err := utils.GetCloudProfile(shoot.Spec.CloudProfileName, r.cloudProfileLister, r.privateCloudProfileLister, shoot.Namespace); err != nil {
+		if _, err := utils.GetCloudProfile(shoot.Spec.CloudProfileName, r.cloudProfileLister, r.namespacedCloudProfileLister, shoot.Namespace); err != nil {
 			return fmt.Errorf("could not find referenced (private) cloud profile when ensuring shoot references: %+v", err.Error())
 		}
 	}

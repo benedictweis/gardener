@@ -48,8 +48,8 @@ func (c *FakeCore) InternalSecrets(namespace string) internalversion.InternalSec
 	return &FakeInternalSecrets{c, namespace}
 }
 
-func (c *FakeCore) PrivateCloudProfiles(namespace string) internalversion.PrivateCloudProfileInterface {
-	return &FakePrivateCloudProfiles{c, namespace}
+func (c *FakeCore) NamespacedCloudProfiles(namespace string) internalversion.NamespacedCloudProfileInterface {
+	return &FakeNamespacedCloudProfiles{c, namespace}
 }
 
 func (c *FakeCore) Projects() internalversion.ProjectInterface {

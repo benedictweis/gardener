@@ -965,6 +965,46 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}); err != nil {
 		return err
 	}
+	if err := s.AddGeneratedConversionFunc((*NamespacedCloudProfile)(nil), (*core.NamespacedCloudProfile)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1beta1_NamespacedCloudProfile_To_core_NamespacedCloudProfile(a.(*NamespacedCloudProfile), b.(*core.NamespacedCloudProfile), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*core.NamespacedCloudProfile)(nil), (*NamespacedCloudProfile)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_core_NamespacedCloudProfile_To_v1beta1_NamespacedCloudProfile(a.(*core.NamespacedCloudProfile), b.(*NamespacedCloudProfile), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*NamespacedCloudProfileList)(nil), (*core.NamespacedCloudProfileList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1beta1_NamespacedCloudProfileList_To_core_NamespacedCloudProfileList(a.(*NamespacedCloudProfileList), b.(*core.NamespacedCloudProfileList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*core.NamespacedCloudProfileList)(nil), (*NamespacedCloudProfileList)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_core_NamespacedCloudProfileList_To_v1beta1_NamespacedCloudProfileList(a.(*core.NamespacedCloudProfileList), b.(*NamespacedCloudProfileList), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*NamespacedCloudProfileSpec)(nil), (*core.NamespacedCloudProfileSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1beta1_NamespacedCloudProfileSpec_To_core_NamespacedCloudProfileSpec(a.(*NamespacedCloudProfileSpec), b.(*core.NamespacedCloudProfileSpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*core.NamespacedCloudProfileSpec)(nil), (*NamespacedCloudProfileSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_core_NamespacedCloudProfileSpec_To_v1beta1_NamespacedCloudProfileSpec(a.(*core.NamespacedCloudProfileSpec), b.(*NamespacedCloudProfileSpec), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*NamespacedCloudProfileStatus)(nil), (*core.NamespacedCloudProfileStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_v1beta1_NamespacedCloudProfileStatus_To_core_NamespacedCloudProfileStatus(a.(*NamespacedCloudProfileStatus), b.(*core.NamespacedCloudProfileStatus), scope)
+	}); err != nil {
+		return err
+	}
+	if err := s.AddGeneratedConversionFunc((*core.NamespacedCloudProfileStatus)(nil), (*NamespacedCloudProfileStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
+		return Convert_core_NamespacedCloudProfileStatus_To_v1beta1_NamespacedCloudProfileStatus(a.(*core.NamespacedCloudProfileStatus), b.(*NamespacedCloudProfileStatus), scope)
+	}); err != nil {
+		return err
+	}
 	if err := s.AddGeneratedConversionFunc((*Networking)(nil), (*core.Networking)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_v1beta1_Networking_To_core_Networking(a.(*Networking), b.(*core.Networking), scope)
 	}); err != nil {
@@ -1022,46 +1062,6 @@ func RegisterConversions(s *runtime.Scheme) error {
 	}
 	if err := s.AddGeneratedConversionFunc((*core.OpenIDConnectClientAuthentication)(nil), (*OpenIDConnectClientAuthentication)(nil), func(a, b interface{}, scope conversion.Scope) error {
 		return Convert_core_OpenIDConnectClientAuthentication_To_v1beta1_OpenIDConnectClientAuthentication(a.(*core.OpenIDConnectClientAuthentication), b.(*OpenIDConnectClientAuthentication), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*PrivateCloudProfile)(nil), (*core.PrivateCloudProfile)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1beta1_PrivateCloudProfile_To_core_PrivateCloudProfile(a.(*PrivateCloudProfile), b.(*core.PrivateCloudProfile), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*core.PrivateCloudProfile)(nil), (*PrivateCloudProfile)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PrivateCloudProfile_To_v1beta1_PrivateCloudProfile(a.(*core.PrivateCloudProfile), b.(*PrivateCloudProfile), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*PrivateCloudProfileList)(nil), (*core.PrivateCloudProfileList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1beta1_PrivateCloudProfileList_To_core_PrivateCloudProfileList(a.(*PrivateCloudProfileList), b.(*core.PrivateCloudProfileList), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*core.PrivateCloudProfileList)(nil), (*PrivateCloudProfileList)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PrivateCloudProfileList_To_v1beta1_PrivateCloudProfileList(a.(*core.PrivateCloudProfileList), b.(*PrivateCloudProfileList), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*PrivateCloudProfileSpec)(nil), (*core.PrivateCloudProfileSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1beta1_PrivateCloudProfileSpec_To_core_PrivateCloudProfileSpec(a.(*PrivateCloudProfileSpec), b.(*core.PrivateCloudProfileSpec), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*core.PrivateCloudProfileSpec)(nil), (*PrivateCloudProfileSpec)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PrivateCloudProfileSpec_To_v1beta1_PrivateCloudProfileSpec(a.(*core.PrivateCloudProfileSpec), b.(*PrivateCloudProfileSpec), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*PrivateCloudProfileStatus)(nil), (*core.PrivateCloudProfileStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_v1beta1_PrivateCloudProfileStatus_To_core_PrivateCloudProfileStatus(a.(*PrivateCloudProfileStatus), b.(*core.PrivateCloudProfileStatus), scope)
-	}); err != nil {
-		return err
-	}
-	if err := s.AddGeneratedConversionFunc((*core.PrivateCloudProfileStatus)(nil), (*PrivateCloudProfileStatus)(nil), func(a, b interface{}, scope conversion.Scope) error {
-		return Convert_core_PrivateCloudProfileStatus_To_v1beta1_PrivateCloudProfileStatus(a.(*core.PrivateCloudProfileStatus), b.(*PrivateCloudProfileStatus), scope)
 	}); err != nil {
 		return err
 	}
@@ -4295,6 +4295,118 @@ func Convert_core_NamedResourceReference_To_v1beta1_NamedResourceReference(in *c
 	return autoConvert_core_NamedResourceReference_To_v1beta1_NamedResourceReference(in, out, s)
 }
 
+func autoConvert_v1beta1_NamespacedCloudProfile_To_core_NamespacedCloudProfile(in *NamespacedCloudProfile, out *core.NamespacedCloudProfile, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_v1beta1_NamespacedCloudProfileSpec_To_core_NamespacedCloudProfileSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := Convert_v1beta1_NamespacedCloudProfileStatus_To_core_NamespacedCloudProfileStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_v1beta1_NamespacedCloudProfile_To_core_NamespacedCloudProfile is an autogenerated conversion function.
+func Convert_v1beta1_NamespacedCloudProfile_To_core_NamespacedCloudProfile(in *NamespacedCloudProfile, out *core.NamespacedCloudProfile, s conversion.Scope) error {
+	return autoConvert_v1beta1_NamespacedCloudProfile_To_core_NamespacedCloudProfile(in, out, s)
+}
+
+func autoConvert_core_NamespacedCloudProfile_To_v1beta1_NamespacedCloudProfile(in *core.NamespacedCloudProfile, out *NamespacedCloudProfile, s conversion.Scope) error {
+	out.ObjectMeta = in.ObjectMeta
+	if err := Convert_core_NamespacedCloudProfileSpec_To_v1beta1_NamespacedCloudProfileSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := Convert_core_NamespacedCloudProfileStatus_To_v1beta1_NamespacedCloudProfileStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_core_NamespacedCloudProfile_To_v1beta1_NamespacedCloudProfile is an autogenerated conversion function.
+func Convert_core_NamespacedCloudProfile_To_v1beta1_NamespacedCloudProfile(in *core.NamespacedCloudProfile, out *NamespacedCloudProfile, s conversion.Scope) error {
+	return autoConvert_core_NamespacedCloudProfile_To_v1beta1_NamespacedCloudProfile(in, out, s)
+}
+
+func autoConvert_v1beta1_NamespacedCloudProfileList_To_core_NamespacedCloudProfileList(in *NamespacedCloudProfileList, out *core.NamespacedCloudProfileList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]core.NamespacedCloudProfile)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_v1beta1_NamespacedCloudProfileList_To_core_NamespacedCloudProfileList is an autogenerated conversion function.
+func Convert_v1beta1_NamespacedCloudProfileList_To_core_NamespacedCloudProfileList(in *NamespacedCloudProfileList, out *core.NamespacedCloudProfileList, s conversion.Scope) error {
+	return autoConvert_v1beta1_NamespacedCloudProfileList_To_core_NamespacedCloudProfileList(in, out, s)
+}
+
+func autoConvert_core_NamespacedCloudProfileList_To_v1beta1_NamespacedCloudProfileList(in *core.NamespacedCloudProfileList, out *NamespacedCloudProfileList, s conversion.Scope) error {
+	out.ListMeta = in.ListMeta
+	out.Items = *(*[]NamespacedCloudProfile)(unsafe.Pointer(&in.Items))
+	return nil
+}
+
+// Convert_core_NamespacedCloudProfileList_To_v1beta1_NamespacedCloudProfileList is an autogenerated conversion function.
+func Convert_core_NamespacedCloudProfileList_To_v1beta1_NamespacedCloudProfileList(in *core.NamespacedCloudProfileList, out *NamespacedCloudProfileList, s conversion.Scope) error {
+	return autoConvert_core_NamespacedCloudProfileList_To_v1beta1_NamespacedCloudProfileList(in, out, s)
+}
+
+func autoConvert_v1beta1_NamespacedCloudProfileSpec_To_core_NamespacedCloudProfileSpec(in *NamespacedCloudProfileSpec, out *core.NamespacedCloudProfileSpec, s conversion.Scope) error {
+	out.CABundle = (*string)(unsafe.Pointer(in.CABundle))
+	out.Kubernetes = (*core.KubernetesSettings)(unsafe.Pointer(in.Kubernetes))
+	out.MachineImages = *(*[]core.MachineImage)(unsafe.Pointer(&in.MachineImages))
+	out.MachineTypes = *(*[]core.MachineType)(unsafe.Pointer(&in.MachineTypes))
+	out.Regions = *(*[]core.Region)(unsafe.Pointer(&in.Regions))
+	out.SeedSelector = (*core.SeedSelector)(unsafe.Pointer(in.SeedSelector))
+	out.VolumeTypes = *(*[]core.VolumeType)(unsafe.Pointer(&in.VolumeTypes))
+	out.Parent = in.Parent
+	return nil
+}
+
+// Convert_v1beta1_NamespacedCloudProfileSpec_To_core_NamespacedCloudProfileSpec is an autogenerated conversion function.
+func Convert_v1beta1_NamespacedCloudProfileSpec_To_core_NamespacedCloudProfileSpec(in *NamespacedCloudProfileSpec, out *core.NamespacedCloudProfileSpec, s conversion.Scope) error {
+	return autoConvert_v1beta1_NamespacedCloudProfileSpec_To_core_NamespacedCloudProfileSpec(in, out, s)
+}
+
+func autoConvert_core_NamespacedCloudProfileSpec_To_v1beta1_NamespacedCloudProfileSpec(in *core.NamespacedCloudProfileSpec, out *NamespacedCloudProfileSpec, s conversion.Scope) error {
+	out.CABundle = (*string)(unsafe.Pointer(in.CABundle))
+	out.Kubernetes = (*KubernetesSettings)(unsafe.Pointer(in.Kubernetes))
+	out.MachineImages = *(*[]MachineImage)(unsafe.Pointer(&in.MachineImages))
+	out.MachineTypes = *(*[]MachineType)(unsafe.Pointer(&in.MachineTypes))
+	out.Regions = *(*[]Region)(unsafe.Pointer(&in.Regions))
+	out.SeedSelector = (*SeedSelector)(unsafe.Pointer(in.SeedSelector))
+	out.VolumeTypes = *(*[]VolumeType)(unsafe.Pointer(&in.VolumeTypes))
+	out.Parent = in.Parent
+	return nil
+}
+
+// Convert_core_NamespacedCloudProfileSpec_To_v1beta1_NamespacedCloudProfileSpec is an autogenerated conversion function.
+func Convert_core_NamespacedCloudProfileSpec_To_v1beta1_NamespacedCloudProfileSpec(in *core.NamespacedCloudProfileSpec, out *NamespacedCloudProfileSpec, s conversion.Scope) error {
+	return autoConvert_core_NamespacedCloudProfileSpec_To_v1beta1_NamespacedCloudProfileSpec(in, out, s)
+}
+
+func autoConvert_v1beta1_NamespacedCloudProfileStatus_To_core_NamespacedCloudProfileStatus(in *NamespacedCloudProfileStatus, out *core.NamespacedCloudProfileStatus, s conversion.Scope) error {
+	if err := Convert_v1beta1_CloudProfile_To_core_CloudProfile(&in.CloudProfile, &out.CloudProfile, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_v1beta1_NamespacedCloudProfileStatus_To_core_NamespacedCloudProfileStatus is an autogenerated conversion function.
+func Convert_v1beta1_NamespacedCloudProfileStatus_To_core_NamespacedCloudProfileStatus(in *NamespacedCloudProfileStatus, out *core.NamespacedCloudProfileStatus, s conversion.Scope) error {
+	return autoConvert_v1beta1_NamespacedCloudProfileStatus_To_core_NamespacedCloudProfileStatus(in, out, s)
+}
+
+func autoConvert_core_NamespacedCloudProfileStatus_To_v1beta1_NamespacedCloudProfileStatus(in *core.NamespacedCloudProfileStatus, out *NamespacedCloudProfileStatus, s conversion.Scope) error {
+	if err := Convert_core_CloudProfile_To_v1beta1_CloudProfile(&in.CloudProfile, &out.CloudProfile, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+// Convert_core_NamespacedCloudProfileStatus_To_v1beta1_NamespacedCloudProfileStatus is an autogenerated conversion function.
+func Convert_core_NamespacedCloudProfileStatus_To_v1beta1_NamespacedCloudProfileStatus(in *core.NamespacedCloudProfileStatus, out *NamespacedCloudProfileStatus, s conversion.Scope) error {
+	return autoConvert_core_NamespacedCloudProfileStatus_To_v1beta1_NamespacedCloudProfileStatus(in, out, s)
+}
+
 func autoConvert_v1beta1_Networking_To_core_Networking(in *Networking, out *core.Networking, s conversion.Scope) error {
 	out.Type = (*string)(unsafe.Pointer(in.Type))
 	out.ProviderConfig = (*runtime.RawExtension)(unsafe.Pointer(in.ProviderConfig))
@@ -4461,118 +4573,6 @@ func autoConvert_core_OpenIDConnectClientAuthentication_To_v1beta1_OpenIDConnect
 // Convert_core_OpenIDConnectClientAuthentication_To_v1beta1_OpenIDConnectClientAuthentication is an autogenerated conversion function.
 func Convert_core_OpenIDConnectClientAuthentication_To_v1beta1_OpenIDConnectClientAuthentication(in *core.OpenIDConnectClientAuthentication, out *OpenIDConnectClientAuthentication, s conversion.Scope) error {
 	return autoConvert_core_OpenIDConnectClientAuthentication_To_v1beta1_OpenIDConnectClientAuthentication(in, out, s)
-}
-
-func autoConvert_v1beta1_PrivateCloudProfile_To_core_PrivateCloudProfile(in *PrivateCloudProfile, out *core.PrivateCloudProfile, s conversion.Scope) error {
-	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_v1beta1_PrivateCloudProfileSpec_To_core_PrivateCloudProfileSpec(&in.Spec, &out.Spec, s); err != nil {
-		return err
-	}
-	if err := Convert_v1beta1_PrivateCloudProfileStatus_To_core_PrivateCloudProfileStatus(&in.Status, &out.Status, s); err != nil {
-		return err
-	}
-	return nil
-}
-
-// Convert_v1beta1_PrivateCloudProfile_To_core_PrivateCloudProfile is an autogenerated conversion function.
-func Convert_v1beta1_PrivateCloudProfile_To_core_PrivateCloudProfile(in *PrivateCloudProfile, out *core.PrivateCloudProfile, s conversion.Scope) error {
-	return autoConvert_v1beta1_PrivateCloudProfile_To_core_PrivateCloudProfile(in, out, s)
-}
-
-func autoConvert_core_PrivateCloudProfile_To_v1beta1_PrivateCloudProfile(in *core.PrivateCloudProfile, out *PrivateCloudProfile, s conversion.Scope) error {
-	out.ObjectMeta = in.ObjectMeta
-	if err := Convert_core_PrivateCloudProfileSpec_To_v1beta1_PrivateCloudProfileSpec(&in.Spec, &out.Spec, s); err != nil {
-		return err
-	}
-	if err := Convert_core_PrivateCloudProfileStatus_To_v1beta1_PrivateCloudProfileStatus(&in.Status, &out.Status, s); err != nil {
-		return err
-	}
-	return nil
-}
-
-// Convert_core_PrivateCloudProfile_To_v1beta1_PrivateCloudProfile is an autogenerated conversion function.
-func Convert_core_PrivateCloudProfile_To_v1beta1_PrivateCloudProfile(in *core.PrivateCloudProfile, out *PrivateCloudProfile, s conversion.Scope) error {
-	return autoConvert_core_PrivateCloudProfile_To_v1beta1_PrivateCloudProfile(in, out, s)
-}
-
-func autoConvert_v1beta1_PrivateCloudProfileList_To_core_PrivateCloudProfileList(in *PrivateCloudProfileList, out *core.PrivateCloudProfileList, s conversion.Scope) error {
-	out.ListMeta = in.ListMeta
-	out.Items = *(*[]core.PrivateCloudProfile)(unsafe.Pointer(&in.Items))
-	return nil
-}
-
-// Convert_v1beta1_PrivateCloudProfileList_To_core_PrivateCloudProfileList is an autogenerated conversion function.
-func Convert_v1beta1_PrivateCloudProfileList_To_core_PrivateCloudProfileList(in *PrivateCloudProfileList, out *core.PrivateCloudProfileList, s conversion.Scope) error {
-	return autoConvert_v1beta1_PrivateCloudProfileList_To_core_PrivateCloudProfileList(in, out, s)
-}
-
-func autoConvert_core_PrivateCloudProfileList_To_v1beta1_PrivateCloudProfileList(in *core.PrivateCloudProfileList, out *PrivateCloudProfileList, s conversion.Scope) error {
-	out.ListMeta = in.ListMeta
-	out.Items = *(*[]PrivateCloudProfile)(unsafe.Pointer(&in.Items))
-	return nil
-}
-
-// Convert_core_PrivateCloudProfileList_To_v1beta1_PrivateCloudProfileList is an autogenerated conversion function.
-func Convert_core_PrivateCloudProfileList_To_v1beta1_PrivateCloudProfileList(in *core.PrivateCloudProfileList, out *PrivateCloudProfileList, s conversion.Scope) error {
-	return autoConvert_core_PrivateCloudProfileList_To_v1beta1_PrivateCloudProfileList(in, out, s)
-}
-
-func autoConvert_v1beta1_PrivateCloudProfileSpec_To_core_PrivateCloudProfileSpec(in *PrivateCloudProfileSpec, out *core.PrivateCloudProfileSpec, s conversion.Scope) error {
-	out.CABundle = (*string)(unsafe.Pointer(in.CABundle))
-	out.Kubernetes = (*core.KubernetesSettings)(unsafe.Pointer(in.Kubernetes))
-	out.MachineImages = *(*[]core.MachineImage)(unsafe.Pointer(&in.MachineImages))
-	out.MachineTypes = *(*[]core.MachineType)(unsafe.Pointer(&in.MachineTypes))
-	out.Regions = *(*[]core.Region)(unsafe.Pointer(&in.Regions))
-	out.SeedSelector = (*core.SeedSelector)(unsafe.Pointer(in.SeedSelector))
-	out.VolumeTypes = *(*[]core.VolumeType)(unsafe.Pointer(&in.VolumeTypes))
-	out.Parent = in.Parent
-	return nil
-}
-
-// Convert_v1beta1_PrivateCloudProfileSpec_To_core_PrivateCloudProfileSpec is an autogenerated conversion function.
-func Convert_v1beta1_PrivateCloudProfileSpec_To_core_PrivateCloudProfileSpec(in *PrivateCloudProfileSpec, out *core.PrivateCloudProfileSpec, s conversion.Scope) error {
-	return autoConvert_v1beta1_PrivateCloudProfileSpec_To_core_PrivateCloudProfileSpec(in, out, s)
-}
-
-func autoConvert_core_PrivateCloudProfileSpec_To_v1beta1_PrivateCloudProfileSpec(in *core.PrivateCloudProfileSpec, out *PrivateCloudProfileSpec, s conversion.Scope) error {
-	out.CABundle = (*string)(unsafe.Pointer(in.CABundle))
-	out.Kubernetes = (*KubernetesSettings)(unsafe.Pointer(in.Kubernetes))
-	out.MachineImages = *(*[]MachineImage)(unsafe.Pointer(&in.MachineImages))
-	out.MachineTypes = *(*[]MachineType)(unsafe.Pointer(&in.MachineTypes))
-	out.Regions = *(*[]Region)(unsafe.Pointer(&in.Regions))
-	out.SeedSelector = (*SeedSelector)(unsafe.Pointer(in.SeedSelector))
-	out.VolumeTypes = *(*[]VolumeType)(unsafe.Pointer(&in.VolumeTypes))
-	out.Parent = in.Parent
-	return nil
-}
-
-// Convert_core_PrivateCloudProfileSpec_To_v1beta1_PrivateCloudProfileSpec is an autogenerated conversion function.
-func Convert_core_PrivateCloudProfileSpec_To_v1beta1_PrivateCloudProfileSpec(in *core.PrivateCloudProfileSpec, out *PrivateCloudProfileSpec, s conversion.Scope) error {
-	return autoConvert_core_PrivateCloudProfileSpec_To_v1beta1_PrivateCloudProfileSpec(in, out, s)
-}
-
-func autoConvert_v1beta1_PrivateCloudProfileStatus_To_core_PrivateCloudProfileStatus(in *PrivateCloudProfileStatus, out *core.PrivateCloudProfileStatus, s conversion.Scope) error {
-	if err := Convert_v1beta1_CloudProfile_To_core_CloudProfile(&in.CloudProfile, &out.CloudProfile, s); err != nil {
-		return err
-	}
-	return nil
-}
-
-// Convert_v1beta1_PrivateCloudProfileStatus_To_core_PrivateCloudProfileStatus is an autogenerated conversion function.
-func Convert_v1beta1_PrivateCloudProfileStatus_To_core_PrivateCloudProfileStatus(in *PrivateCloudProfileStatus, out *core.PrivateCloudProfileStatus, s conversion.Scope) error {
-	return autoConvert_v1beta1_PrivateCloudProfileStatus_To_core_PrivateCloudProfileStatus(in, out, s)
-}
-
-func autoConvert_core_PrivateCloudProfileStatus_To_v1beta1_PrivateCloudProfileStatus(in *core.PrivateCloudProfileStatus, out *PrivateCloudProfileStatus, s conversion.Scope) error {
-	if err := Convert_core_CloudProfile_To_v1beta1_CloudProfile(&in.CloudProfile, &out.CloudProfile, s); err != nil {
-		return err
-	}
-	return nil
-}
-
-// Convert_core_PrivateCloudProfileStatus_To_v1beta1_PrivateCloudProfileStatus is an autogenerated conversion function.
-func Convert_core_PrivateCloudProfileStatus_To_v1beta1_PrivateCloudProfileStatus(in *core.PrivateCloudProfileStatus, out *PrivateCloudProfileStatus, s conversion.Scope) error {
-	return autoConvert_core_PrivateCloudProfileStatus_To_v1beta1_PrivateCloudProfileStatus(in, out, s)
 }
 
 func autoConvert_v1beta1_Project_To_core_Project(in *Project, out *core.Project, s conversion.Scope) error {

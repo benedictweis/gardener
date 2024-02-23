@@ -60,13 +60,13 @@ func Register(plugins *admission.Plugins) {
 // QuotaValidator contains listers and admission handler.
 type QuotaValidator struct {
 	*admission.Handler
-	shootLister               gardencorelisters.ShootLister
-	cloudProfileLister        gardencorelisters.CloudProfileLister
-	privateCloudProfileLister gardencorelisters.PrivateCloudProfileLister
-	secretBindingLister       gardencorelisters.SecretBindingLister
-	quotaLister               gardencorelisters.QuotaLister
-	readyFunc                 admission.ReadyFunc
-	time                      timeutils.Ops
+	shootLister                  gardencorelisters.ShootLister
+	cloudProfileLister           gardencorelisters.CloudProfileLister
+	namespacedCloudProfileLister gardencorelisters.NamespacedCloudProfileLister
+	secretBindingLister          gardencorelisters.SecretBindingLister
+	quotaLister                  gardencorelisters.QuotaLister
+	readyFunc                    admission.ReadyFunc
+	time                         timeutils.Ops
 }
 
 var (
@@ -97,8 +97,8 @@ func (q *QuotaValidator) SetInternalCoreInformerFactory(f gardencoreinformers.Sh
 	cloudProfileInformer := f.Core().InternalVersion().CloudProfiles()
 	q.cloudProfileLister = cloudProfileInformer.Lister()
 
-	privateCloudProfileLister := f.Core().InternalVersion().PrivateCloudProfiles()
-	q.privateCloudProfileLister = privateCloudProfileLister.Lister()
+	namespacedCloudProfileLister := f.Core().InternalVersion().NamespacedCloudProfiles()
+	q.namespacedCloudProfileLister = namespacedCloudProfileLister.Lister()
 
 	secretBindingInformer := f.Core().InternalVersion().SecretBindings()
 	q.secretBindingLister = secretBindingInformer.Lister()
@@ -117,8 +117,8 @@ func (q *QuotaValidator) ValidateInitialization() error {
 	if q.cloudProfileLister == nil {
 		return errors.New("missing cloudProfile lister")
 	}
-	if q.privateCloudProfileLister == nil {
-		return errors.New("missing privateCloudProfile lister")
+	if q.namespacedCloudProfileLister == nil {
+		return errors.New("missing namespacedCloudProfile lister")
 	}
 	if q.secretBindingLister == nil {
 		return errors.New("missing secretBinding lister")
@@ -354,7 +354,7 @@ func (q *QuotaValidator) determineRequiredResources(allocatedResources corev1.Re
 }
 
 func (q *QuotaValidator) getShootResources(shoot core.Shoot) (corev1.ResourceList, error) {
-	cloudProfile, err := utils.GetCloudProfile(shoot.Spec.CloudProfileName, q.cloudProfileLister, q.privateCloudProfileLister, shoot.Namespace)
+	cloudProfile, err := utils.GetCloudProfile(shoot.Spec.CloudProfileName, q.cloudProfileLister, q.namespacedCloudProfileLister, shoot.Namespace)
 	if err != nil {
 		return nil, apierrors.NewInternalError(fmt.Errorf("could not find referenced cloud profile: %+v", err.Error()))
 	}

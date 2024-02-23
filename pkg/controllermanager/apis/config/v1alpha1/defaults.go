@@ -308,8 +308,8 @@ func SetDefaults_ControllerManagerControllerConfiguration(obj *ControllerManager
 	if obj.ExposureClass == nil {
 		obj.ExposureClass = &ExposureClassControllerConfiguration{}
 	}
-	if obj.PrivateCloudProfile == nil {
-		obj.PrivateCloudProfile = &PrivateCloudProfileControllerConfiguration{}
+	if obj.NamespacedCloudProfile == nil {
+		obj.NamespacedCloudProfile = &NamespacedCloudProfileControllerConfiguration{}
 	}
 	if obj.Project == nil {
 		obj.Project = &ProjectControllerConfiguration{}

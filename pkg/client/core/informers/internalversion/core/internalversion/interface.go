@@ -28,8 +28,8 @@ type Interface interface {
 	ExposureClasses() ExposureClassInformer
 	// InternalSecrets returns a InternalSecretInformer.
 	InternalSecrets() InternalSecretInformer
-	// PrivateCloudProfiles returns a PrivateCloudProfileInformer.
-	PrivateCloudProfiles() PrivateCloudProfileInformer
+	// NamespacedCloudProfiles returns a NamespacedCloudProfileInformer.
+	NamespacedCloudProfiles() NamespacedCloudProfileInformer
 	// Projects returns a ProjectInformer.
 	Projects() ProjectInformer
 	// Quotas returns a QuotaInformer.
@@ -95,9 +95,9 @@ func (v *version) InternalSecrets() InternalSecretInformer {
 	return &internalSecretInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// PrivateCloudProfiles returns a PrivateCloudProfileInformer.
-func (v *version) PrivateCloudProfiles() PrivateCloudProfileInformer {
-	return &privateCloudProfileInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+// NamespacedCloudProfiles returns a NamespacedCloudProfileInformer.
+func (v *version) NamespacedCloudProfiles() NamespacedCloudProfileInformer {
+	return &namespacedCloudProfileInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // Projects returns a ProjectInformer.
