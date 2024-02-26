@@ -1734,6 +1734,13 @@ message NamespacedCloudProfileList {
   repeated NamespacedCloudProfile items = 2;
 }
 
+// NamespacedCloudProfileParent holds the information about the parent of the NamespacedCloudProfile
+message NamespacedCloudProfileParent {
+  optional string kind = 1;
+
+  optional string name = 2;
+}
+
 // NamespacedCloudProfileSpec is the specification of a NamespacedCloudProfile.
 // It must contain exactly one of its defined keys.
 message NamespacedCloudProfileSpec {
@@ -1779,7 +1786,7 @@ message NamespacedCloudProfileSpec {
 
   // A pointer to the NamespacedCloudProfiles parent CloudProfile
   // +optional
-  optional string parent = 10;
+  optional NamespacedCloudProfileParent parent = 10;
 }
 
 // NamespacedCloudProfileStatus holds the most recently observed status of the project

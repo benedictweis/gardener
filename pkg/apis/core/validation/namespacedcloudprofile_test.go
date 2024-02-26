@@ -48,8 +48,11 @@ var _ = Describe("NamespacedCloudProfile Validation Tests ", func() {
 					"Type":  Equal(field.ErrorTypeRequired),
 					"Field": Equal("metadata.namespace"),
 				})), PointTo(MatchFields(IgnoreExtras, Fields{
+					"Type":  Equal(field.ErrorTypeInvalid),
+					"Field": Equal("spec.parent.kind"),
+				})), PointTo(MatchFields(IgnoreExtras, Fields{
 					"Type":  Equal(field.ErrorTypeRequired),
-					"Field": Equal("spec.parent"),
+					"Field": Equal("spec.parent.name"),
 				}))))
 		})
 
@@ -60,7 +63,10 @@ var _ = Describe("NamespacedCloudProfile Validation Tests ", func() {
 					Namespace: "default",
 				},
 				Spec: core.NamespacedCloudProfileSpec{
-					Parent: "parent-profile",
+					Parent: core.NamespacedCloudProfileParent{
+						Kind: "CloudProfile",
+						Name: "profile-parent",
+					},
 				},
 			}
 
@@ -108,7 +114,10 @@ var _ = Describe("NamespacedCloudProfile Validation Tests ", func() {
 						Namespace: "default",
 					},
 					Spec: core.NamespacedCloudProfileSpec{
-						Parent: "unknown",
+						Parent: core.NamespacedCloudProfileParent{
+							Kind: "CloudProfile",
+							Name: "unknown",
+						},
 						SeedSelector: &core.SeedSelector{
 							LabelSelector: metav1.LabelSelector{
 								MatchLabels: map[string]string{"foo": "bar"},
@@ -190,14 +199,31 @@ var _ = Describe("NamespacedCloudProfile Validation Tests ", func() {
 			)
 
 			It("should forbid not specifying a parent", func() {
-				namespacedCloudProfile.Spec.Parent = ""
+				namespacedCloudProfile.Spec.Parent = core.NamespacedCloudProfileParent{Kind: "", Name: ""}
 
 				errorList := ValidateNamespacedCloudProfile(namespacedCloudProfile)
 
-				Expect(errorList).To(ConsistOf(PointTo(MatchFields(IgnoreExtras, Fields{
-					"Type":  Equal(field.ErrorTypeRequired),
-					"Field": Equal("spec.parent"),
-				}))))
+				Expect(errorList).To(ConsistOf(
+					PointTo(MatchFields(IgnoreExtras, Fields{
+						"Type":  Equal(field.ErrorTypeRequired),
+						"Field": Equal("spec.parent.name"),
+					})),
+					PointTo(MatchFields(IgnoreExtras, Fields{
+						"Type":  Equal(field.ErrorTypeInvalid),
+						"Field": Equal("spec.parent.kind"),
+					}))))
+			})
+
+			It("should forbid not specifying an invalid parent kind", func() {
+				namespacedCloudProfile.Spec.Parent = core.NamespacedCloudProfileParent{Kind: "SomeOtherCloudPofile", Name: "my-profile"}
+
+				errorList := ValidateNamespacedCloudProfile(namespacedCloudProfile)
+
+				Expect(errorList).To(ConsistOf(
+					PointTo(MatchFields(IgnoreExtras, Fields{
+						"Type":  Equal(field.ErrorTypeInvalid),
+						"Field": Equal("spec.parent.kind"),
+					}))))
 			})
 
 			It("should forbid ca bundles with unsupported format", func() {
@@ -956,7 +982,10 @@ var _ = Describe("NamespacedCloudProfile Validation Tests ", func() {
 					Namespace:       "dummy",
 				},
 				Spec: core.NamespacedCloudProfileSpec{
-					Parent: "aws-profile",
+					Parent: core.NamespacedCloudProfileParent{
+						Kind: "CloudProfile",
+						Name: "aws-profile",
+					},
 					MachineImages: []core.MachineImage{
 						{
 							Name: "some-machineimage",

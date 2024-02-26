@@ -218,7 +218,7 @@ func (r *ReferenceManager) ValidateInitialization() error {
 		return errors.New("missing quota lister")
 	}
 	if r.namespacedCloudProfileLister == nil {
-		return errors.New("missing private cloud profile lister")
+		return errors.New("missing namespaced cloud profile lister")
 	}
 	if r.projectLister == nil {
 		return errors.New("missing project lister")

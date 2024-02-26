@@ -34,11 +34,10 @@ var _ = Describe("Admission", func() {
 			admissionHandler    *ValidateNamespacedCloudProfile
 			coreInformerFactory gardencoreinformers.SharedInformerFactory
 
-			namespacedCloudProfile core.NamespacedCloudProfile
-			parentCloudProfile     core.CloudProfile
-			machineType            core.MachineType
-
-			parentCloudProfileName = "parent-profile"
+			namespacedCloudProfile       core.NamespacedCloudProfile
+			namespacedCloudProfileParent core.NamespacedCloudProfileParent
+			parentCloudProfile           core.CloudProfile
+			machineType                  core.MachineType
 
 			namespacedCloudProfileBase = core.NamespacedCloudProfile{
 				ObjectMeta: metav1.ObjectMeta{
@@ -47,7 +46,7 @@ var _ = Describe("Admission", func() {
 			}
 			parentCloudProfileBase = core.CloudProfile{
 				ObjectMeta: metav1.ObjectMeta{
-					Name: parentCloudProfileName,
+					Name: "parent-profile",
 				},
 			}
 			machineTypeBase = core.MachineType{
@@ -59,6 +58,10 @@ var _ = Describe("Admission", func() {
 			ctx = context.TODO()
 
 			namespacedCloudProfile = *namespacedCloudProfileBase.DeepCopy()
+			namespacedCloudProfileParent = core.NamespacedCloudProfileParent{
+				Kind: "CloudProfile",
+				Name: parentCloudProfileBase.Name,
+			}
 			parentCloudProfile = *parentCloudProfileBase.DeepCopy()
 			machineType = machineTypeBase
 
@@ -69,7 +72,7 @@ var _ = Describe("Admission", func() {
 		})
 
 		It("should not allow creating a NamespacedCloudProfile with an invalid parent reference", func() {
-			namespacedCloudProfile.Spec.Parent = "idontexist"
+			namespacedCloudProfile.Spec.Parent = core.NamespacedCloudProfileParent{Kind: "CloudProfile", Name: "idontexist"}
 
 			attrs := admission.NewAttributesRecord(&namespacedCloudProfile, nil, core.Kind("NamespacedCloudProfile").WithVersion("version"), "", namespacedCloudProfile.Name, core.Resource("namespacedcloudprofile").WithVersion("version"), "", admission.Create, &metav1.CreateOptions{}, false, nil)
 
@@ -79,7 +82,7 @@ var _ = Describe("Admission", func() {
 		It("should allow creating a NamespacedCloudProfile with a valid parent reference", func() {
 			Expect(coreInformerFactory.Core().InternalVersion().CloudProfiles().Informer().GetStore().Add(&parentCloudProfile)).To(Succeed())
 
-			namespacedCloudProfile.Spec.Parent = parentCloudProfileName
+			namespacedCloudProfile.Spec.Parent = namespacedCloudProfileParent
 
 			attrs := admission.NewAttributesRecord(&namespacedCloudProfile, nil, core.Kind("NamespacedCloudProfile").WithVersion("version"), "", namespacedCloudProfile.Name, core.Resource("namespacedcloudprofile").WithVersion("version"), "", admission.Create, &metav1.CreateOptions{}, false, nil)
 
@@ -90,7 +93,7 @@ var _ = Describe("Admission", func() {
 			parentCloudProfile.Spec.MachineTypes = []core.MachineType{machineType}
 			Expect(coreInformerFactory.Core().InternalVersion().CloudProfiles().Informer().GetStore().Add(&parentCloudProfile)).To(Succeed())
 
-			namespacedCloudProfile.Spec.Parent = parentCloudProfileName
+			namespacedCloudProfile.Spec.Parent = namespacedCloudProfileParent
 			namespacedCloudProfile.Spec.MachineTypes = []core.MachineType{machineType}
 
 			attrs := admission.NewAttributesRecord(&namespacedCloudProfile, nil, core.Kind("NamespacedCloudProfile").WithVersion("version"), "", namespacedCloudProfile.Name, core.Resource("namespacedcloudprofile").WithVersion("version"), "", admission.Create, &metav1.CreateOptions{}, false, nil)
@@ -102,7 +105,7 @@ var _ = Describe("Admission", func() {
 		It("should allow creating a NamespacedCloudProfile that defines a machineType of the parent CloudProfile if it was added to the NamespacedCloudProfile first", func() {
 			Expect(coreInformerFactory.Core().InternalVersion().CloudProfiles().Informer().GetStore().Add(&parentCloudProfile)).To(Succeed())
 
-			namespacedCloudProfile.Spec.Parent = parentCloudProfileName
+			namespacedCloudProfile.Spec.Parent = namespacedCloudProfileParent
 			namespacedCloudProfile.Spec.MachineTypes = []core.MachineType{machineType}
 
 			attrs := admission.NewAttributesRecord(&namespacedCloudProfile, nil, core.Kind("NamespacedCloudProfile").WithVersion("version"), "", namespacedCloudProfile.Name, core.Resource("namespacedcloudprofile").WithVersion("version"), "", admission.Create, &metav1.CreateOptions{}, false, nil)
@@ -119,7 +122,7 @@ var _ = Describe("Admission", func() {
 		It("should allow creating a NamespacedCloudProfile that defines a machineType of the parent CloudProfile if it was added to the NamespacedCloudProfile first but is changed", func() {
 			Expect(coreInformerFactory.Core().InternalVersion().CloudProfiles().Informer().GetStore().Add(&parentCloudProfile)).To(Succeed())
 
-			namespacedCloudProfile.Spec.Parent = parentCloudProfileName
+			namespacedCloudProfile.Spec.Parent = namespacedCloudProfileParent
 			namespacedCloudProfile.Spec.MachineTypes = []core.MachineType{machineType}
 
 			attrs := admission.NewAttributesRecord(&namespacedCloudProfile, nil, core.Kind("NamespacedCloudProfile").WithVersion("version"), "", namespacedCloudProfile.Name, core.Resource("namespacedcloudprofile").WithVersion("version"), "", admission.Create, &metav1.CreateOptions{}, false, nil)
@@ -138,7 +141,7 @@ var _ = Describe("Admission", func() {
 		It("should allow creating a NamespacedCloudProfile that defines a different machineType than the parent CloudProfile", func() {
 			Expect(coreInformerFactory.Core().InternalVersion().CloudProfiles().Informer().GetStore().Add(&parentCloudProfile)).To(Succeed())
 
-			namespacedCloudProfile.Spec.Parent = parentCloudProfileName
+			namespacedCloudProfile.Spec.Parent = namespacedCloudProfileParent
 			namespacedCloudProfile.Spec.MachineTypes = []core.MachineType{{Name: "my-other-machine"}}
 
 			parentCloudProfile.Spec.MachineTypes = []core.MachineType{machineType}
@@ -161,7 +164,7 @@ var _ = Describe("Admission", func() {
 	})
 
 	Describe("#New", func() {
-		It("should only handle CREATE operations", func() {
+		It("should only handle CREATE and UPDATE operations", func() {
 			dr, err := New()
 			Expect(err).ToNot(HaveOccurred())
 			Expect(dr.Handles(admission.Create)).To(BeTrue())

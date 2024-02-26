@@ -30,10 +30,11 @@ var _ = Describe("NamespacedCloudProfile controller tests", func() {
 	const parentCloudProfileName = testID + "-my-profile"
 
 	var (
-		parentCloudProfile     *gardencorev1beta1.CloudProfile
-		namespacedCloudProfile *gardencorev1beta1.NamespacedCloudProfile
-		_                      *gardencorev1beta1.CloudProfile
-		shoot                  *gardencorev1beta1.Shoot
+		parentCloudProfile           *gardencorev1beta1.CloudProfile
+		namespacedCloudProfile       *gardencorev1beta1.NamespacedCloudProfile
+		namespacedCloudProfileParent *gardencorev1beta1.NamespacedCloudProfileParent
+		_                            *gardencorev1beta1.CloudProfile
+		shoot                        *gardencorev1beta1.Shoot
 	)
 
 	BeforeEach(func() {
@@ -66,6 +67,11 @@ var _ = Describe("NamespacedCloudProfile controller tests", func() {
 			},
 		}
 
+		namespacedCloudProfileParent = &gardencorev1beta1.NamespacedCloudProfileParent{
+			Kind: "CloudProfile",
+			Name: parentCloudProfile.Name,
+		}
+
 		namespacedCloudProfile = &gardencorev1beta1.NamespacedCloudProfile{
 			ObjectMeta: metav1.ObjectMeta{
 				GenerateName: testID + "-",
@@ -73,7 +79,7 @@ var _ = Describe("NamespacedCloudProfile controller tests", func() {
 				Labels:       map[string]string{testID: testRunID},
 			},
 			Spec: gardencorev1beta1.NamespacedCloudProfileSpec{
-				Parent: parentCloudProfileName,
+				Parent: *namespacedCloudProfileParent,
 				Kubernetes: &gardencorev1beta1.KubernetesSettings{
 					Versions: []gardencorev1beta1.ExpirableVersion{{Version: "1.2.4"}},
 				},
@@ -146,7 +152,7 @@ var _ = Describe("NamespacedCloudProfile controller tests", func() {
 				SecretBindingName: ptr.To("my-provider-account"),
 				Region:            "foo-region",
 				Provider: gardencorev1beta1.Provider{
-					Type: namespacedCloudProfile.Spec.Parent,
+					Type: "aws",
 					Workers: []gardencorev1beta1.Worker{
 						{
 							Name:    "cpu-worker",

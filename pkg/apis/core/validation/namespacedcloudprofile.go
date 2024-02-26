@@ -55,9 +55,7 @@ func ValidateNamespacedCloudProfileSpecUpdate(_, _ *core.NamespacedCloudProfileS
 func ValidateNamespacedCloudProfileSpec(spec *core.NamespacedCloudProfileSpec, fldPath *field.Path) field.ErrorList {
 	allErrs := field.ErrorList{}
 
-	if len(spec.Parent) == 0 {
-		allErrs = append(allErrs, field.Required(fldPath.Child("parent"), "must provide a parent cloud profile"))
-	}
+	allErrs = append(allErrs, validateParent(spec.Parent, fldPath.Child("parent"))...)
 
 	if spec.Kubernetes != nil {
 		allErrs = append(allErrs, validateKubernetesSettings(*spec.Kubernetes, fldPath.Child("kubernetes"))...)
@@ -82,6 +80,19 @@ func ValidateNamespacedCloudProfileSpec(spec *core.NamespacedCloudProfileSpec, f
 		if err != nil {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("caBundle"), *(spec.CABundle), "caBundle is not a valid PEM-encoded certificate"))
 		}
+	}
+
+	return allErrs
+}
+
+func validateParent(parent core.NamespacedCloudProfileParent, fldPath *field.Path) field.ErrorList {
+	allErrs := field.ErrorList{}
+
+	if parent.Kind != "CloudProfile" {
+		allErrs = append(allErrs, field.Invalid(fldPath.Child("kind"), parent.Kind, "kind must be CloudProfile"))
+	}
+	if len(parent.Name) == 0 {
+		allErrs = append(allErrs, field.Required(fldPath.Child("name"), "must provide a parent name"))
 	}
 
 	return allErrs

@@ -58,7 +58,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, request reconcile.Request) (
 	}
 
 	parentCloudProfile := &gardencorev1beta1.CloudProfile{}
-	if err := r.Client.Get(ctx, client.ObjectKey{Name: namespacedCloudProfile.Spec.Parent}, parentCloudProfile); err != nil {
+	if err := r.Client.Get(ctx, client.ObjectKey{Name: namespacedCloudProfile.Spec.Parent.Name}, parentCloudProfile); err != nil {
 		if apierrors.IsNotFound(err) {
 			log.V(1).Info("Parent object is gone, stop reconciling")
 			return reconcile.Result{}, nil

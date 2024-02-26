@@ -60,7 +60,10 @@ var _ = Describe("Reconciler", func() {
 				Name: namespacedCloudProfileName,
 			},
 			Spec: gardencorev1beta1.NamespacedCloudProfileSpec{
-				Parent: parentCloudProfileName,
+				Parent: gardencorev1beta1.NamespacedCloudProfileParent{
+					Kind: "CloudProfile",
+					Name: parentCloudProfileName,
+				},
 			},
 		}
 		_ = &gardencorev1beta1.CloudProfile{

@@ -123,6 +123,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.NamedResourceReference":                     schema_pkg_apis_core_v1beta1_NamedResourceReference(ref),
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.NamespacedCloudProfile":                     schema_pkg_apis_core_v1beta1_NamespacedCloudProfile(ref),
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.NamespacedCloudProfileList":                 schema_pkg_apis_core_v1beta1_NamespacedCloudProfileList(ref),
+		"github.com/gardener/gardener/pkg/apis/core/v1beta1.NamespacedCloudProfileParent":               schema_pkg_apis_core_v1beta1_NamespacedCloudProfileParent(ref),
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.NamespacedCloudProfileSpec":                 schema_pkg_apis_core_v1beta1_NamespacedCloudProfileSpec(ref),
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.NamespacedCloudProfileStatus":               schema_pkg_apis_core_v1beta1_NamespacedCloudProfileStatus(ref),
 		"github.com/gardener/gardener/pkg/apis/core/v1beta1.Networking":                                 schema_pkg_apis_core_v1beta1_Networking(ref),
@@ -5186,6 +5187,34 @@ func schema_pkg_apis_core_v1beta1_NamespacedCloudProfileList(ref common.Referenc
 	}
 }
 
+func schema_pkg_apis_core_v1beta1_NamespacedCloudProfileParent(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "NamespacedCloudProfileParent holds the information about the parent of the NamespacedCloudProfile",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+				},
+				Required: []string{"kind", "name"},
+			},
+		},
+	}
+}
+
 func schema_pkg_apis_core_v1beta1_NamespacedCloudProfileSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -5295,16 +5324,15 @@ func schema_pkg_apis_core_v1beta1_NamespacedCloudProfileSpec(ref common.Referenc
 					"parent": {
 						SchemaProps: spec.SchemaProps{
 							Description: "A pointer to the NamespacedCloudProfiles parent CloudProfile",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
+							Default:     map[string]interface{}{},
+							Ref:         ref("github.com/gardener/gardener/pkg/apis/core/v1beta1.NamespacedCloudProfileParent"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"github.com/gardener/gardener/pkg/apis/core/v1beta1.KubernetesSettings", "github.com/gardener/gardener/pkg/apis/core/v1beta1.MachineImage", "github.com/gardener/gardener/pkg/apis/core/v1beta1.MachineType", "github.com/gardener/gardener/pkg/apis/core/v1beta1.Region", "github.com/gardener/gardener/pkg/apis/core/v1beta1.SeedSelector", "github.com/gardener/gardener/pkg/apis/core/v1beta1.VolumeType"},
+			"github.com/gardener/gardener/pkg/apis/core/v1beta1.KubernetesSettings", "github.com/gardener/gardener/pkg/apis/core/v1beta1.MachineImage", "github.com/gardener/gardener/pkg/apis/core/v1beta1.MachineType", "github.com/gardener/gardener/pkg/apis/core/v1beta1.NamespacedCloudProfileParent", "github.com/gardener/gardener/pkg/apis/core/v1beta1.Region", "github.com/gardener/gardener/pkg/apis/core/v1beta1.SeedSelector", "github.com/gardener/gardener/pkg/apis/core/v1beta1.VolumeType"},
 	}
 }
 

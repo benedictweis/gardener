@@ -1095,7 +1095,9 @@ type of the seed must match the shoot&rsquo;s provider.</p>
 <td>
 <code>parent</code></br>
 <em>
-string
+<a href="#core.gardener.cloud/v1beta1.NamespacedCloudProfileParent">
+NamespacedCloudProfileParent
+</a>
 </em>
 </td>
 <td>
@@ -7680,6 +7682,45 @@ Kubernetes autoscaling/v1.CrossVersionObjectReference
 </tr>
 </tbody>
 </table>
+<h3 id="core.gardener.cloud/v1beta1.NamespacedCloudProfileParent">NamespacedCloudProfileParent
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#core.gardener.cloud/v1beta1.NamespacedCloudProfileSpec">NamespacedCloudProfileSpec</a>)
+</p>
+<p>
+<p>NamespacedCloudProfileParent holds the information about the parent of the NamespacedCloudProfile</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>kind</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>name</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="core.gardener.cloud/v1beta1.NamespacedCloudProfileSpec">NamespacedCloudProfileSpec
 </h3>
 <p>
@@ -7802,7 +7843,9 @@ type of the seed must match the shoot&rsquo;s provider.</p>
 <td>
 <code>parent</code></br>
 <em>
-string
+<a href="#core.gardener.cloud/v1beta1.NamespacedCloudProfileParent">
+NamespacedCloudProfileParent
+</a>
 </em>
 </td>
 <td>

@@ -36,9 +36,9 @@ type convertor struct {
 func newTableConvertor() rest.TableConvertor {
 	return &convertor{
 		headers: []metav1beta1.TableColumnDefinition{
-			{Name: "Namespace", Type: "string", Format: "name", Description: swaggerMetadataDescriptions["namespace"]},
 			{Name: "Name", Type: "string", Format: "name", Description: swaggerMetadataDescriptions["name"]},
-			{Name: "Parent", Type: "string", Format: "name", Description: swaggerMetadataDescriptions["parent"]},
+			{Name: "Parent Name", Type: "string", Format: "name", Description: swaggerMetadataDescriptions["parent.name"]},
+			{Name: "Parent Kind", Type: "string", Format: "name", Description: swaggerMetadataDescriptions["parent.kind"]},
 			{Name: "Age", Type: "date", Description: swaggerMetadataDescriptions["creationTimestamp"]},
 		},
 	}
@@ -68,9 +68,9 @@ func (c *convertor) ConvertToTable(_ context.Context, obj runtime.Object, _ runt
 			cells                  = []interface{}{}
 		)
 
-		cells = append(cells, namespacedCloudProfile.Namespace)
 		cells = append(cells, namespacedCloudProfile.Name)
-		cells = append(cells, namespacedCloudProfile.Spec.Parent)
+		cells = append(cells, namespacedCloudProfile.Spec.Parent.Name)
+		cells = append(cells, namespacedCloudProfile.Spec.Parent.Kind)
 		cells = append(cells, metatable.ConvertToHumanReadableDateType(namespacedCloudProfile.CreationTimestamp))
 
 		return cells, nil

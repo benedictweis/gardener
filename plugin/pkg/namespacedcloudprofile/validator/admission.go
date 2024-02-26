@@ -127,7 +127,7 @@ func (v *ValidateNamespacedCloudProfile) Validate(_ context.Context, a admission
 		}
 	}
 
-	parentCloudProfileName := namespacedCloudProfile.Spec.Parent
+	parentCloudProfileName := namespacedCloudProfile.Spec.Parent.Name
 	parentCloudProfile, err := v.cloudProfileLister.Get(parentCloudProfileName)
 	if err != nil {
 		return apierrors.NewBadRequest("parent CloudProfile could not be found")

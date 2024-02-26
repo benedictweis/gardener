@@ -81,11 +81,17 @@ type NamespacedCloudProfileSpec struct {
 	VolumeTypes []VolumeType
 	// A pointer to the NamespacedCloudProfiles parent CloudProfile
 	// +optional
-	Parent string
+	Parent NamespacedCloudProfileParent
 }
 
 // NamespacedCloudProfileStatus holds the most recently observed status of the project
 type NamespacedCloudProfileStatus struct {
 	// CloudProfile is the most recently generated CloudProfile of the NamespacedCloudProfile
 	CloudProfile CloudProfile
+}
+
+// NamespacedCloudProfileParent holds the information about the parent of the NamespacedCloudProfile
+type NamespacedCloudProfileParent struct {
+	Kind string
+	Name string
 }

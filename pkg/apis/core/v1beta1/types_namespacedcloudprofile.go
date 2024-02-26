@@ -82,11 +82,17 @@ type NamespacedCloudProfileSpec struct {
 	VolumeTypes []VolumeType `json:"volumeTypes,omitempty" patchStrategy:"merge" patchMergeKey:"name" protobuf:"bytes,9,opt,name=volumeTypes"`
 	// A pointer to the NamespacedCloudProfiles parent CloudProfile
 	// +optional
-	Parent string `json:"parent" protobuf:"bytes,10,req,name=parent"`
+	Parent NamespacedCloudProfileParent `json:"parent" protobuf:"bytes,10,req,name=parent"`
 }
 
 // NamespacedCloudProfileStatus holds the most recently observed status of the project
 type NamespacedCloudProfileStatus struct {
 	// CloudProfile is the most recently generated CloudProfile of the NamespacedCloudProfile
 	CloudProfile CloudProfile `json:"cloudProfile,omitempty" protobuf:"bytes,1,opt,name=cloudProfile"`
+}
+
+// NamespacedCloudProfileParent holds the information about the parent of the NamespacedCloudProfile
+type NamespacedCloudProfileParent struct {
+	Kind string `json:"kind" protobuf:"bytes,1,req,name=kind"`
+	Name string `json:"name" protobuf:"bytes,2,req,name=name"`
 }
