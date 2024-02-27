@@ -17,6 +17,7 @@ package gardener
 import (
 	"context"
 	"fmt"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 
 	pkgclient "sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -31,17 +32,16 @@ func GetCloudProfile(ctx context.Context, client pkgclient.Client, name, namespa
 	if err == nil {
 		return cloudProfile, nil
 	}
-	// TODO how to compare errors correctly
-	//if !errors.Is(err, apierrors.NewNotFound(core.Resource("cloudprofile"), name)) {
-	//	return nil, err
-	//}
+	if !apierrors.IsNotFound(err) {
+		return nil, err
+	}
 	namespacedCloudProfile := &gardencorev1beta1.NamespacedCloudProfile{}
 	perr := client.Get(ctx, pkgclient.ObjectKey{Name: name, Namespace: namespace}, namespacedCloudProfile)
 	if perr == nil {
 		return &namespacedCloudProfile.Status.CloudProfile, nil
 	}
-	//if !errors.Is(perr, apierrors.NewNotFound(core.Resource("namespacedcloudprofile"), name)) {
-	//	return nil, err
-	//}
+	if !apierrors.IsNotFound(perr) {
+		return nil, err
+	}
 	return nil, fmt.Errorf("could not get (private) cloud profile: %+v, %+v", err.Error(), perr.Error())
 }

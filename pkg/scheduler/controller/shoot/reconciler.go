@@ -139,6 +139,7 @@ func (r *Reconciler) determineSeed(
 		return nil, err
 	}
 	cloudProfile, err := gardenerutils.GetCloudProfile(ctx, r.Client, shoot.Spec.CloudProfileName, shoot.Namespace)
+	log.Error(nil, "log", "cloudProfile", cloudProfile)
 	if err != nil {
 		return nil, err
 	}

@@ -265,8 +265,8 @@ func (r *Reconciler) prepareOperation(ctx context.Context, log logr.Logger, shoo
 		return nil, reconcile.Result{}, fmt.Errorf("cannot find Project for namespace '%s'", shoot.Namespace)
 	}
 
-	cloudProfile := &gardencorev1beta1.CloudProfile{}
-	if err := r.GardenClient.Get(ctx, kubernetesutils.Key(shoot.Spec.CloudProfileName), cloudProfile); err != nil {
+	cloudProfile, err := gardenerutils.GetCloudProfile(ctx, r.GardenClient, shoot.Spec.CloudProfileName, shoot.Namespace)
+	if err != nil {
 		return nil, reconcile.Result{}, err
 	}
 

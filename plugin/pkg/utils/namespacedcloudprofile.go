@@ -16,6 +16,7 @@ package utils
 
 import (
 	"fmt"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/gardener/gardener/pkg/apis/core"
 	"github.com/gardener/gardener/pkg/client/core/listers/core/internalversion"
@@ -27,16 +28,15 @@ func GetCloudProfile(name string, cloudProfileLister internalversion.CloudProfil
 	if err == nil {
 		return cloudProfile, nil
 	}
-	// TODO how to compare errors correctly
-	//if !errors.Is(err, apierrors.NewNotFound(core.Resource("cloudprofile"), name)) {
-	//	return nil, err
-	//}
+	if !apierrors.IsNotFound(err) {
+		return nil, err
+	}
 	namespacedCloudProfile, perr := NamespacedCloudProfileLister.NamespacedCloudProfiles(namespace).Get(name)
 	if perr == nil {
 		return &namespacedCloudProfile.Status.CloudProfile, nil
 	}
-	//if !errors.Is(perr, apierrors.NewNotFound(core.Resource("namespacedcloudprofile"), name)) {
-	//	return nil, err
-	//}
+	if !apierrors.IsNotFound(perr) {
+		return nil, err
+	}
 	return nil, fmt.Errorf("could not get (private) cloud profile: %+v, %+v", err.Error(), perr.Error())
 }
