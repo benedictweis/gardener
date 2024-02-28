@@ -47,6 +47,8 @@ const (
 	// VertexTypeManagedSeed is a constant for a 'ManagedSeed' vertex.
 	VertexTypeManagedSeed
 	// VertexTypeNamespace is a constant for a 'Namespace' vertex.
+	VertexTypeNamespacedCloudProfile
+	// VertexTypeNamespace is a constant for a 'Namespace' vertex.
 	VertexTypeNamespace
 	// VertexTypeProject is a constant for a 'Project' vertex.
 	VertexTypeProject
@@ -78,6 +80,7 @@ var vertexTypes = map[VertexType]string{
 	VertexTypeExposureClass:             "ExposureClass",
 	VertexTypeLease:                     "Lease",
 	VertexTypeManagedSeed:               "ManagedSeed",
+	VertexTypeNamespacedCloudProfile:    "NamespacedCloudProfile",
 	VertexTypeNamespace:                 "Namespace",
 	VertexTypeProject:                   "Project",
 	VertexTypeSecret:                    "Secret",
