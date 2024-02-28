@@ -75,6 +75,7 @@ var (
 	internalSecretResource            = gardencorev1beta1.Resource("internalsecrets")
 	leaseResource                     = coordinationv1.Resource("leases")
 	managedSeedResource               = seedmanagementv1alpha1.Resource("managedseeds")
+	namespacedCloudProfileResource    = gardencorev1beta1.Resource("namespacedcloudprofiles")
 	namespaceResource                 = corev1.Resource("namespaces")
 	projectResource                   = gardencorev1beta1.Resource("projects")
 	secretBindingResource             = gardencorev1beta1.Resource("secretbindings")
@@ -175,6 +176,12 @@ func (a *authorizer) Authorize(_ context.Context, attrs auth.Attributes) (auth.D
 				[]string{"update", "patch"},
 				[]string{"get", "list", "watch"},
 				[]string{"status"},
+			)
+		case namespacedCloudProfileResource:
+			return a.authorize(requestLog, seedName, graph.VertexTypeNamespacedCloudProfile, attrs,
+				nil,
+				[]string{"create", "update", "patch", "delete", "get", "list", "watch"},
+				nil,
 			)
 		case namespaceResource:
 			return a.authorizeRead(requestLog, seedName, graph.VertexTypeNamespace, attrs)

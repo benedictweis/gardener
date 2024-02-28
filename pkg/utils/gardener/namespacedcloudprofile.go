@@ -17,8 +17,8 @@ package gardener
 import (
 	"context"
 	"fmt"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	pkgclient "sigs.k8s.io/controller-runtime/pkg/client"
 
 	gardencorev1beta1 "github.com/gardener/gardener/pkg/apis/core/v1beta1"
