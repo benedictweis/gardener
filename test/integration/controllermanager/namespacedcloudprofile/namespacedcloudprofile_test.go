@@ -26,14 +26,13 @@ import (
 	. "github.com/gardener/gardener/pkg/utils/test/matchers"
 )
 
-var _ = Describe("NamespacedCloudProfile controller tests", func() {
+var _ = FDescribe("NamespacedCloudProfile controller tests", func() {
 	const parentCloudProfileName = testID + "-my-profile"
 
 	var (
 		parentCloudProfile           *gardencorev1beta1.CloudProfile
 		namespacedCloudProfile       *gardencorev1beta1.NamespacedCloudProfile
 		namespacedCloudProfileParent *gardencorev1beta1.CloudProfileReference
-		_                            *gardencorev1beta1.CloudProfile
 		shoot                        *gardencorev1beta1.Shoot
 	)
 
@@ -98,46 +97,6 @@ var _ = Describe("NamespacedCloudProfile controller tests", func() {
 					Memory: resource.MustParse("2Gi"),
 				}},
 				Regions: []gardencorev1beta1.Region{
-					{Name: "some-other-region"},
-				},
-			},
-		}
-
-		_ = &gardencorev1beta1.CloudProfile{
-			Spec: gardencorev1beta1.CloudProfileSpec{
-				Type: "some-type",
-				Kubernetes: gardencorev1beta1.KubernetesSettings{
-					Versions: []gardencorev1beta1.ExpirableVersion{{Version: "1.2.3"}, {Version: "1.2.4"}},
-				},
-				MachineImages: []gardencorev1beta1.MachineImage{
-					{
-						Name: "some-image",
-						Versions: []gardencorev1beta1.MachineImageVersion{
-							{ExpirableVersion: gardencorev1beta1.ExpirableVersion{Version: "4.5.6"}},
-						},
-					},
-					{
-						Name: "some-other-image",
-						Versions: []gardencorev1beta1.MachineImageVersion{
-							{ExpirableVersion: gardencorev1beta1.ExpirableVersion{Version: "4.5.7"}},
-						},
-					},
-				},
-				MachineTypes: []gardencorev1beta1.MachineType{
-					{
-						Name:   "some-type",
-						CPU:    resource.MustParse("1"),
-						GPU:    resource.MustParse("0"),
-						Memory: resource.MustParse("1Gi"),
-					},
-					{
-						Name:   "some-other-type",
-						CPU:    resource.MustParse("2"),
-						GPU:    resource.MustParse("0"),
-						Memory: resource.MustParse("2Gi"),
-					}},
-				Regions: []gardencorev1beta1.Region{
-					{Name: "some-region"},
 					{Name: "some-other-region"},
 				},
 			},
@@ -258,16 +217,4 @@ var _ = Describe("NamespacedCloudProfile controller tests", func() {
 			}).Should(BeNotFoundError())
 		})
 	})
-
-	//Context("merging the NamespacedCloudProfile with the parent Cloud Profile", func() {
-	//	It("should merge the NamespacedCloudProfile with the parent Cloud profile correctly", func() {
-	//		By("Ensure NamespacedCloudProfile is present")
-	//		Eventually(func() error {
-	//			return testClient.Get(ctx, client.ObjectKeyFromObject(namespacedCloudProfile), namespacedCloudProfile)
-	//		}).Should(Succeed())
-	//
-	//		By("Ensure NamespacedCloudProfile rendered CloudProfile was correctly merged")
-	//		Expect(namespacedCloudProfile.Status.CloudProfile.Spec).To(Equal(mergedCloudProfile.Spec))
-	//	})
-	//})
 })

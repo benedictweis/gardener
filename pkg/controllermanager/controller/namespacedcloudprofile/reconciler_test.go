@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 
+	mockclient "github.com/gardener/gardener/third_party/mock/controller-runtime/client"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"go.uber.org/mock/gomock"
@@ -26,10 +27,10 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
 	gardencorev1beta1 "github.com/gardener/gardener/pkg/apis/core/v1beta1"
-	mockclient "github.com/gardener/gardener/pkg/mock/controller-runtime/client"
 	kubernetesutils "github.com/gardener/gardener/pkg/utils/kubernetes"
 )
 
@@ -43,8 +44,8 @@ var _ = Describe("Reconciler", func() {
 		parentCloudProfileName     string
 		fakeErr                    error
 		reconciler                 reconcile.Reconciler
-		_                          *gardencorev1beta1.NamespacedCloudProfile
-		_                          *gardencorev1beta1.CloudProfile
+		namespacedCloudProfile     *gardencorev1beta1.NamespacedCloudProfile
+		cloudProfile               *gardencorev1beta1.CloudProfile
 	)
 
 	BeforeEach(func() {
@@ -55,7 +56,7 @@ var _ = Describe("Reconciler", func() {
 		parentCloudProfileName = "test-cloudprofile"
 		fakeErr = fmt.Errorf("fake err")
 		reconciler = &Reconciler{Client: c, Recorder: &record.FakeRecorder{}}
-		_ = &gardencorev1beta1.NamespacedCloudProfile{
+		namespacedCloudProfile = &gardencorev1beta1.NamespacedCloudProfile{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: namespacedCloudProfileName,
 			},
@@ -66,7 +67,7 @@ var _ = Describe("Reconciler", func() {
 				},
 			},
 		}
-		_ = &gardencorev1beta1.CloudProfile{
+		cloudProfile = &gardencorev1beta1.CloudProfile{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: parentCloudProfileName,
 			},
@@ -93,24 +94,25 @@ var _ = Describe("Reconciler", func() {
 		Expect(err).To(MatchError(fakeErr))
 	})
 
-	//It("should return an err because object reading failed on parent cloud profile", func() {
-	//	c.EXPECT().Get(gomock.Any(), kubernetesutils.Key(namespacedCloudProfileName), gomock.AssignableToTypeOf(&gardencorev1beta1.NamespacedCloudProfile{})).DoAndReturn(func(_ context.Context, _ client.ObjectKey, obj *gardencorev1beta1.NamespacedCloudProfile, _ ...client.GetOption) error {
-	//		*obj = *namespacedCloudProfile
-	//		return nil
-	//	})
-	//
-	//	c.EXPECT().Get(gomock.Any(), kubernetesutils.Key(parentCloudProfileName), gomock.AssignableToTypeOf(&gardencorev1beta1.CloudProfile{})).DoAndReturn(func(_ context.Context, _ client.ObjectKey, obj *gardencorev1beta1.CloudProfile, _ ...client.GetOption) error {
-	//		*obj = *parentCloudProfile
-	//		return nil
-	//	})
-	//
-	//	c.EXPECT().Patch(gomock.Any(), gomock.AssignableToTypeOf(&gardencorev1beta1.NamespacedCloudProfile{}), gomock.Any()).DoAndReturn(func(_ context.Context, o client.Object, patch client.Patch, opts ...client.PatchOption) error {
-	//		Expect(patch.Data(o)).To(BeEquivalentTo(fmt.Sprintf(`{"status":{"cloudProfile":{"metadata":{"name":"test-cloudprofile"}}}}`)))
-	//		return nil
-	//	})
-	//
-	//	result, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: types.NamespacedName{Name: namespacedCloudProfileName}})
-	//	Expect(result).To(Equal(reconcile.Result{}))
-	//	Expect(err).To(MatchError(ContainSubstring("hi")))
-	//})
+	It("should merge profiles correctly", func() {
+		c.EXPECT().Get(gomock.Any(), kubernetesutils.Key(namespacedCloudProfileName), gomock.AssignableToTypeOf(&gardencorev1beta1.NamespacedCloudProfile{})).DoAndReturn(func(_ context.Context, _ client.ObjectKey, obj *gardencorev1beta1.NamespacedCloudProfile, _ ...client.GetOption) error {
+			namespacedCloudProfile.DeepCopyInto(obj)
+			return nil
+		})
+
+		c.EXPECT().Get(gomock.Any(), kubernetesutils.Key(parentCloudProfileName), gomock.AssignableToTypeOf(&gardencorev1beta1.CloudProfile{})).DoAndReturn(func(_ context.Context, _ client.ObjectKey, obj *gardencorev1beta1.CloudProfile, _ ...client.GetOption) error {
+			cloudProfile.DeepCopyInto(obj)
+			return nil
+		})
+
+		// FIXME !!!
+		c.EXPECT().Patch(gomock.Any(), gomock.AssignableToTypeOf(&gardencorev1beta1.NamespacedCloudProfile{}), gomock.Any()).DoAndReturn(func(_ context.Context, o client.Object, patch client.Patch, opts ...client.PatchOption) error {
+			Expect(patch.Data(o)).To(BeEquivalentTo(fmt.Sprintf(`{"status":{"cloudProfile":{"metadata":{"name":"test-cloudprofile"}}}}`)))
+			return nil
+		})
+
+		result, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: types.NamespacedName{Name: namespacedCloudProfileName}})
+		Expect(result).To(Equal(reconcile.Result{}))
+		Expect(err).To(MatchError(ContainSubstring("hi")))
+	})
 })

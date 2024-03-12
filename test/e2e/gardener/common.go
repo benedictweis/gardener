@@ -162,3 +162,21 @@ func SetupDNSForMultiZoneTest() {
 		},
 	}
 }
+
+func DefaultNamespacedCloudProfile() *gardencorev1beta1.NamespacedCloudProfile {
+	return &gardencorev1beta1.NamespacedCloudProfile{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "my-profile",
+			Namespace: "garden-local",
+		},
+		Spec: gardencorev1beta1.NamespacedCloudProfileSpec{
+			Parent: gardencorev1beta1.CloudProfileReference{
+				Kind: "CloudProfile",
+				Name: "local",
+			},
+			Regions: []gardencorev1beta1.Region{
+				{Name: "test-region123"},
+			},
+		},
+	}
+}
