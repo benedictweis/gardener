@@ -34,7 +34,7 @@ import (
 	kubernetesutils "github.com/gardener/gardener/pkg/utils/kubernetes"
 )
 
-var _ = Describe("Reconciler", func() {
+var _ = FDescribe("Reconciler", func() {
 	var (
 		ctx  = context.TODO()
 		ctrl *gomock.Controller
@@ -64,6 +64,13 @@ var _ = Describe("Reconciler", func() {
 				Parent: gardencorev1beta1.CloudProfileReference{
 					Kind: "CloudProfile",
 					Name: parentCloudProfileName,
+				},
+				Kubernetes: &gardencorev1beta1.KubernetesSettings{
+					Versions: []gardencorev1beta1.ExpirableVersion{
+						{
+							Version: "1.2.3",
+						},
+					},
 				},
 			},
 		}
@@ -107,12 +114,14 @@ var _ = Describe("Reconciler", func() {
 
 		// FIXME !!!
 		c.EXPECT().Patch(gomock.Any(), gomock.AssignableToTypeOf(&gardencorev1beta1.NamespacedCloudProfile{}), gomock.Any()).DoAndReturn(func(_ context.Context, o client.Object, patch client.Patch, opts ...client.PatchOption) error {
-			Expect(patch.Data(o)).To(BeEquivalentTo(fmt.Sprintf(`{"status":{"cloudProfile":{"metadata":{"name":"test-cloudprofile"}}}}`)))
+			Expect(patch.Data(o)).To(BeEquivalentTo(fmt.Sprintf(`{"status":{"cloudProfileSpec":{"kubernetes":{"versions":[{"version":"1.2.3"}]}}}}`)))
 			return nil
 		})
 
+		c.EXPECT().Patch(gomock.Any(), gomock.AssignableToTypeOf(&gardencorev1beta1.NamespacedCloudProfile{}), gomock.Any())
+
 		result, err := reconciler.Reconcile(ctx, reconcile.Request{NamespacedName: types.NamespacedName{Name: namespacedCloudProfileName}})
 		Expect(result).To(Equal(reconcile.Result{}))
-		Expect(err).To(MatchError(ContainSubstring("hi")))
+		Expect(err).ToNot(HaveOccurred())
 	})
 })

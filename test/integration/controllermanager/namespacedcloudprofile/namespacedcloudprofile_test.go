@@ -33,6 +33,7 @@ var _ = FDescribe("NamespacedCloudProfile controller tests", func() {
 		parentCloudProfile           *gardencorev1beta1.CloudProfile
 		namespacedCloudProfile       *gardencorev1beta1.NamespacedCloudProfile
 		namespacedCloudProfileParent *gardencorev1beta1.CloudProfileReference
+		mergedCloudProfileSpec       *gardencorev1beta1.CloudProfileSpec
 		shoot                        *gardencorev1beta1.Shoot
 	)
 
@@ -98,6 +99,19 @@ var _ = FDescribe("NamespacedCloudProfile controller tests", func() {
 				}},
 				Regions: []gardencorev1beta1.Region{
 					{Name: "some-other-region"},
+				},
+			},
+		}
+
+		mergedCloudProfileSpec = &gardencorev1beta1.CloudProfileSpec{
+			Kubernetes: gardencorev1beta1.KubernetesSettings{
+				Versions: []gardencorev1beta1.ExpirableVersion{
+					{
+						Version: "1.2.3",
+					},
+					{
+						Version: "1.2.4",
+					},
 				},
 			},
 		}
@@ -216,5 +230,13 @@ var _ = FDescribe("NamespacedCloudProfile controller tests", func() {
 				return testClient.Get(ctx, client.ObjectKeyFromObject(namespacedCloudProfile), namespacedCloudProfile)
 			}).Should(BeNotFoundError())
 		})
+	})
+
+	It("should merge the NamespacedCloudProfile correctly", func() {
+		Eventually(func(g Gomega) {
+			err := testClient.Get(ctx, client.ObjectKeyFromObject(namespacedCloudProfile), namespacedCloudProfile)
+			g.Expect(err).NotTo(HaveOccurred())
+			g.Expect(namespacedCloudProfile.Status.CloudProfileSpec).To(Equal(mergedCloudProfileSpec))
+		}).Should(Succeed())
 	})
 })

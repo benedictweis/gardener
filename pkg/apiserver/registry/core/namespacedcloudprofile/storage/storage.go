@@ -15,6 +15,8 @@
 package storage
 
 import (
+	"context"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apiserver/pkg/registry/generic"
 	genericregistry "k8s.io/apiserver/pkg/registry/generic/registry"
@@ -32,19 +34,21 @@ type REST struct {
 // NamespacedCloudProfileStorage implements the storage for NamespacedCloudProfiles.
 type NamespacedCloudProfileStorage struct {
 	NamespacedCloudProfile *REST
+	Status                 *StatusREST
 }
 
 // NewStorage creates a new NamespacedCloudProfileStorage object.
 func NewStorage(optsGetter generic.RESTOptionsGetter) NamespacedCloudProfileStorage {
-	namespacedCloudProfileRest := NewREST(optsGetter)
+	namespacedCloudProfileRest, namespacedCloudProfileStatusRest := NewREST(optsGetter)
 
 	return NamespacedCloudProfileStorage{
 		NamespacedCloudProfile: namespacedCloudProfileRest,
+		Status:                 namespacedCloudProfileStatusRest,
 	}
 }
 
 // NewREST returns a RESTStorage object that will work with NamespacedCloudProfile objects.
-func NewREST(optsGetter generic.RESTOptionsGetter) *REST {
+func NewREST(optsGetter generic.RESTOptionsGetter) (*REST, *StatusREST) {
 	store := &genericregistry.Store{
 		NewFunc:                   func() runtime.Object { return &core.NamespacedCloudProfile{} },
 		NewListFunc:               func() runtime.Object { return &core.NamespacedCloudProfileList{} },
@@ -62,7 +66,42 @@ func NewREST(optsGetter generic.RESTOptionsGetter) *REST {
 	if err := store.CompleteWithOptions(options); err != nil {
 		panic(err)
 	}
-	return &REST{store}
+
+	statusStore := *store
+	statusStore.UpdateStrategy = namespacedcloudprofileregistry.StatusStrategy
+	return &REST{store}, &StatusREST{store: &statusStore}
+}
+
+// StatusREST implements the REST endpoint for changing the status of a NamespacedCloudProfile.
+type StatusREST struct {
+	store *genericregistry.Store
+}
+
+var (
+	_ rest.Storage = &StatusREST{}
+	_ rest.Getter  = &StatusREST{}
+	_ rest.Updater = &StatusREST{}
+)
+
+// New creates a new (empty) internal BackupBucket object.
+func (r *StatusREST) New() runtime.Object {
+	return &core.NamespacedCloudProfile{}
+}
+
+// Destroy cleans up its resources on shutdown.
+func (r *StatusREST) Destroy() {
+	// Given that underlying store is shared with REST,
+	// we don't destroy it here explicitly.
+}
+
+// Get retrieves the object from the storage. It is required to support Patch.
+func (r *StatusREST) Get(ctx context.Context, name string, options *metav1.GetOptions) (runtime.Object, error) {
+	return r.store.Get(ctx, name, options)
+}
+
+// Update alters the status subset of an object.
+func (r *StatusREST) Update(ctx context.Context, name string, objInfo rest.UpdatedObjectInfo, createValidation rest.ValidateObjectFunc, updateValidation rest.ValidateObjectUpdateFunc, forceAllowCreate bool, options *metav1.UpdateOptions) (runtime.Object, bool, error) {
+	return r.store.Update(ctx, name, objInfo, createValidation, updateValidation, forceAllowCreate, options)
 }
 
 // Implement ShortNamesProvider

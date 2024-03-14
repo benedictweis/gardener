@@ -131,5 +131,4 @@ func mergeCloudProfiles(parentCloudProfile *gardencorev1beta1.CloudProfile, name
 		mergedCABundles := fmt.Sprintf("%s%s", *parentCloudProfile.Spec.CABundle, *namespacedCloudProfile.Spec.CABundle)
 		parentCloudProfile.Spec.CABundle = &mergedCABundles
 	}
-	// TODO how to merge seedSelector?
 }

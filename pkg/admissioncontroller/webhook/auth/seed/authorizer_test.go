@@ -559,7 +559,7 @@ var _ = Describe("Seed", func() {
 
 					Expect(err).NotTo(HaveOccurred())
 					Expect(decision).To(Equal(auth.DecisionNoOpinion))
-					Expect(reason).To(ContainSubstring("only the following verbs are allowed for this resource type: [get list watch]"))
+					Expect(reason).To(ContainSubstring("only the following verbs are allowed for this resource type: [create update patch delete get list watch]"))
 				},
 					Entry("deletecollection", "deletecollection"),
 				)
@@ -572,16 +572,6 @@ var _ = Describe("Seed", func() {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(decision).To(Equal(auth.DecisionNoOpinion))
 					Expect(reason).To(ContainSubstring("no relationship found"))
-				})
-
-				It("should have no opinion because request is for a subresource", func() {
-					attrs.Subresource = "status"
-
-					decision, reason, err := authorizer.Authorize(ctx, attrs)
-
-					Expect(err).NotTo(HaveOccurred())
-					Expect(decision).To(Equal(auth.DecisionNoOpinion))
-					Expect(reason).To(ContainSubstring("only the following subresources are allowed for this resource type: []"))
 				})
 
 				It("should have no opinion because no resource name is given", func() {

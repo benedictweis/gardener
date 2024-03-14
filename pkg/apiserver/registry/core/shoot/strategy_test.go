@@ -16,6 +16,8 @@ package shoot_test
 
 import (
 	"context"
+	"github.com/gardener/gardener/pkg/features"
+	"github.com/gardener/gardener/pkg/utils/test"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -65,7 +67,77 @@ var _ = Describe("Strategy", func() {
 		})
 	})
 
+	Describe("#PrepareForCreate", func() {
+		Context("cloudProfile field removal", func() {
+			var (
+				shoot                 *core.Shoot
+				cloudProfileReference *core.CloudProfileReference
+			)
+
+			BeforeEach(func() {
+				shoot = &core.Shoot{}
+				cloudProfileReference = &core.CloudProfileReference{
+					Kind: "foo",
+					Name: "bar",
+				}
+			})
+
+			It("should remove cloudProfile field if namespacedcloudprofile feature gate is disabled", func() {
+				defer test.WithFeatureGate(features.DefaultFeatureGate, features.UseNamespacedCloudProfile, false)()
+
+				shoot.Spec.CloudProfile = cloudProfileReference
+				strategy.PrepareForCreate(context.TODO(), shoot)
+
+				Expect(shoot.Spec.CloudProfile).To(BeNil())
+			})
+
+			It("should not remove cloudProfile field if namespacedcloudprofile feature gate is enabled", func() {
+				defer test.WithFeatureGate(features.DefaultFeatureGate, features.UseNamespacedCloudProfile, true)()
+
+				shoot.Spec.CloudProfile = cloudProfileReference
+				strategy.PrepareForCreate(context.TODO(), shoot)
+
+				Expect(shoot.Spec.CloudProfile).To(Equal(cloudProfileReference))
+			})
+		})
+	})
+
 	Describe("#PrepareForUpdate", func() {
+		Context("cloudProfile field removal", func() {
+			var (
+				oldShoot              *core.Shoot
+				newShoot              *core.Shoot
+				cloudProfileReference *core.CloudProfileReference
+			)
+
+			BeforeEach(func() {
+				oldShoot = &core.Shoot{}
+				newShoot = oldShoot.DeepCopy()
+				cloudProfileReference = &core.CloudProfileReference{
+					Kind: "foo",
+					Name: "bar",
+				}
+			})
+
+			It("should remove cloudProfile field if namespacedcloudprofile feature gate is disabled", func() {
+				defer test.WithFeatureGate(features.DefaultFeatureGate, features.UseNamespacedCloudProfile, false)()
+
+				newShoot.Spec.CloudProfile = cloudProfileReference
+				strategy.PrepareForUpdate(context.TODO(), newShoot, oldShoot)
+
+				Expect(newShoot.Spec.CloudProfile).To(BeNil())
+			})
+
+			It("should not remove cloudProfile field if namespacedcloudprofile feature gate is enabled", func() {
+				defer test.WithFeatureGate(features.DefaultFeatureGate, features.UseNamespacedCloudProfile, true)()
+
+				newShoot.Spec.CloudProfile = cloudProfileReference
+				strategy.PrepareForUpdate(context.TODO(), newShoot, oldShoot)
+
+				Expect(newShoot.Spec.CloudProfile).To(Equal(cloudProfileReference))
+			})
+		})
+
 		Context("seedName change", func() {
 			var (
 				oldShoot *core.Shoot

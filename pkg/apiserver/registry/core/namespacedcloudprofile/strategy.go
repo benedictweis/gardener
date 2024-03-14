@@ -43,6 +43,7 @@ func (namespacedCloudProfileStrategy) PrepareForCreate(_ context.Context, obj ru
 	namespacedCloudProfile := obj.(*core.NamespacedCloudProfile)
 
 	dropExpiredVersions(namespacedCloudProfile)
+	namespacedCloudProfile.Status = core.NamespacedCloudProfileStatus{}
 }
 
 func (namespacedCloudProfileStrategy) Validate(_ context.Context, obj runtime.Object) field.ErrorList {
@@ -109,4 +110,21 @@ func dropExpiredVersions(namespacedCloudProfile *core.NamespacedCloudProfile) {
 
 		namespacedCloudProfile.Spec.MachineImages[i].Versions = validMachineImageVersions
 	}
+}
+
+type namespacedCloudProfileStatusStrategy struct {
+	namespacedCloudProfileStrategy
+}
+
+// StatusStrategy defines the storage strategy for the status subresource of BackupBuckets.
+var StatusStrategy = namespacedCloudProfileStatusStrategy{Strategy}
+
+func (namespacedCloudProfileStatusStrategy) PrepareForUpdate(_ context.Context, obj, old runtime.Object) {
+	newBackupBucket := obj.(*core.BackupBucket)
+	oldBackupBucket := old.(*core.BackupBucket)
+	newBackupBucket.Spec = oldBackupBucket.Spec
+}
+
+func (namespacedCloudProfileStatusStrategy) ValidateUpdate(_ context.Context, obj, old runtime.Object) field.ErrorList {
+	return field.ErrorList{}
 }
