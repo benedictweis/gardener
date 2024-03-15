@@ -125,6 +125,6 @@ func (namespacedCloudProfileStatusStrategy) PrepareForUpdate(_ context.Context, 
 	newBackupBucket.Spec = oldBackupBucket.Spec
 }
 
-func (namespacedCloudProfileStatusStrategy) ValidateUpdate(_ context.Context, obj, old runtime.Object) field.ErrorList {
+func (namespacedCloudProfileStatusStrategy) ValidateUpdate(_ context.Context, _, _ runtime.Object) field.ErrorList {
 	return field.ErrorList{}
 }

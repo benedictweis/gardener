@@ -24,7 +24,6 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	pkgclient "sigs.k8s.io/controller-runtime/pkg/client"
 
 	gardencorev1beta1 "github.com/gardener/gardener/pkg/apis/core/v1beta1"
@@ -84,7 +83,7 @@ var _ = Describe("NamespacedCloudProfile", func() {
 			c.EXPECT().Get(ctx,
 				kubernetesutils.Key(cloudProfileName),
 				gomock.AssignableToTypeOf(&gardencorev1beta1.CloudProfile{}),
-			).DoAndReturn(func(_ context.Context, _ client.ObjectKey, obj *gardencorev1beta1.CloudProfile, _ ...client.GetOption) error {
+			).DoAndReturn(func(_ context.Context, _ pkgclient.ObjectKey, obj *gardencorev1beta1.CloudProfile, _ ...pkgclient.GetOption) error {
 				cloudProfile.DeepCopyInto(obj)
 				return nil
 			})
@@ -100,7 +99,7 @@ var _ = Describe("NamespacedCloudProfile", func() {
 			c.EXPECT().Get(ctx,
 				pkgclient.ObjectKey{Name: cloudProfileName, Namespace: namespaceName},
 				gomock.AssignableToTypeOf(&gardencorev1beta1.NamespacedCloudProfile{}),
-			).DoAndReturn(func(_ context.Context, _ client.ObjectKey, obj *gardencorev1beta1.NamespacedCloudProfile, _ ...client.GetOption) error {
+			).DoAndReturn(func(_ context.Context, _ pkgclient.ObjectKey, obj *gardencorev1beta1.NamespacedCloudProfile, _ ...pkgclient.GetOption) error {
 				namespacedCloudProfile.DeepCopyInto(obj)
 				return nil
 			})

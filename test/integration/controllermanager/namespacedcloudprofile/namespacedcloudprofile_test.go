@@ -26,7 +26,7 @@ import (
 	. "github.com/gardener/gardener/pkg/utils/test/matchers"
 )
 
-var _ = FDescribe("NamespacedCloudProfile controller tests", func() {
+var _ = Describe("NamespacedCloudProfile controller tests", func() {
 	const parentCloudProfileName = testID + "-my-profile"
 
 	var (
@@ -232,11 +232,13 @@ var _ = FDescribe("NamespacedCloudProfile controller tests", func() {
 		})
 	})
 
-	It("should merge the NamespacedCloudProfile correctly", func() {
-		Eventually(func(g Gomega) {
-			err := testClient.Get(ctx, client.ObjectKeyFromObject(namespacedCloudProfile), namespacedCloudProfile)
-			g.Expect(err).NotTo(HaveOccurred())
-			g.Expect(namespacedCloudProfile.Status.CloudProfileSpec).To(Equal(mergedCloudProfileSpec))
-		}).Should(Succeed())
+	Context("merging the CloudProfiles", func() {
+		It("should merge the NamespacedCloudProfile correctly", func() {
+			Eventually(func(g Gomega) {
+				err := testClient.Get(ctx, client.ObjectKeyFromObject(namespacedCloudProfile), namespacedCloudProfile)
+				g.Expect(err).NotTo(HaveOccurred())
+				g.Expect(namespacedCloudProfile.Status.CloudProfileSpec).To(Equal(*mergedCloudProfileSpec))
+			}).Should(Succeed())
+		})
 	})
 })

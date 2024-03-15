@@ -79,7 +79,7 @@ var _ = Describe("Shoot Tests", Label("Shoot", "default"), func() {
 		test(e2e.DefaultWorkerlessShoot("e2e-wake-up"))
 	})
 
-	FContext("Shoot with NamespacedCloudProfile", Label("basic"), func() {
+	Context("Shoot with NamespacedCloudProfile", Label("basic"), func() {
 		shoot := e2e.DefaultShoot("e2e-wake-up")
 		shoot.Spec.CloudProfileName = "my-profile"
 		test(shoot)

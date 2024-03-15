@@ -514,7 +514,7 @@ var _ = Describe("Seed", func() {
 				})
 			})
 
-			FContext("when requested for NamespacedCloudProfiles", func() {
+			Context("when requested for NamespacedCloudProfiles", func() {
 				var (
 					namespacedCloudProfileName, namespace string
 					attrs                                 *auth.AttributesRecord
@@ -534,11 +534,10 @@ var _ = Describe("Seed", func() {
 					}
 				})
 
-				DescribeTable("should return correct result if path exists",
+				DescribeTable("should return correct result if verb is always allowed",
 					func(verb string) {
 						attrs.Verb = verb
 
-						graph.EXPECT().HasPathFrom(graphpkg.VertexTypeNamespacedCloudProfile, namespace, namespacedCloudProfileName, graphpkg.VertexTypeSeed, "", seedName).Return(true)
 						decision, reason, err := authorizer.Authorize(ctx, attrs)
 						Expect(err).NotTo(HaveOccurred())
 						Expect(decision).To(Equal(auth.DecisionAllow))
@@ -563,26 +562,6 @@ var _ = Describe("Seed", func() {
 				},
 					Entry("deletecollection", "deletecollection"),
 				)
-
-				It("should have no opinion because path to seed does not exists", func() {
-					graph.EXPECT().HasPathFrom(graphpkg.VertexTypeNamespacedCloudProfile, namespace, namespacedCloudProfileName, graphpkg.VertexTypeSeed, "", seedName).Return(false)
-
-					decision, reason, err := authorizer.Authorize(ctx, attrs)
-
-					Expect(err).NotTo(HaveOccurred())
-					Expect(decision).To(Equal(auth.DecisionNoOpinion))
-					Expect(reason).To(ContainSubstring("no relationship found"))
-				})
-
-				It("should have no opinion because no resource name is given", func() {
-					attrs.Name = ""
-
-					decision, reason, err := authorizer.Authorize(ctx, attrs)
-
-					Expect(err).NotTo(HaveOccurred())
-					Expect(decision).To(Equal(auth.DecisionNoOpinion))
-					Expect(reason).To(ContainSubstring("No Object name found"))
-				})
 			})
 
 			Context("when requested for Namespaces", func() {

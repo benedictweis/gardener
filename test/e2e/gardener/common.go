@@ -163,6 +163,7 @@ func SetupDNSForMultiZoneTest() {
 	}
 }
 
+// DefaultNamespacedCloudProfile returns a NamespacedCloudProfile object with default values for the e2e tests.
 func DefaultNamespacedCloudProfile() *gardencorev1beta1.NamespacedCloudProfile {
 	return &gardencorev1beta1.NamespacedCloudProfile{
 		ObjectMeta: metav1.ObjectMeta{
