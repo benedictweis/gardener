@@ -161,6 +161,7 @@ global:
       IPv6SingleStack: true
       MutableShootSpecNetworkingNodes: true
       ShootForceDeletion: true
+      UseNamespacedCloudProfile: false
     resources: {}
     podLabels:
       networking.resources.gardener.cloud/to-all-webhook-targets: allowed
