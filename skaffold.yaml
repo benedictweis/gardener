@@ -262,6 +262,7 @@ build:
             - pkg/controllermanager/controller/event
             - pkg/controllermanager/controller/exposureclass
             - pkg/controllermanager/controller/managedseedset
+            - pkg/controllermanager/controller/namespacedcloudprofile
             - pkg/controllermanager/controller/project
             - pkg/controllermanager/controller/project/activity
             - pkg/controllermanager/controller/project/project
