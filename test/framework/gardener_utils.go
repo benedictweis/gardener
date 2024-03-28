@@ -549,8 +549,8 @@ func (f *GardenerFramework) MigrateShoot(ctx context.Context, shoot *gardencorev
 
 // GetCloudProfile returns the cloudprofile from gardener with the give name
 func (f *GardenerFramework) GetCloudProfile(ctx context.Context, name string) (*gardencorev1beta1.CloudProfile, error) {
-	cloudProfile := &gardencorev1beta1.CloudProfile{}
-	if err := f.GardenClient.Client().Get(ctx, client.ObjectKey{Name: name}, cloudProfile); err != nil {
+	cloudProfile, err := gardenerutils.GetCloudProfile(ctx, f.GardenClient.Client(), name, "garden-local")
+	if err != nil {
 		return nil, fmt.Errorf("could not get CloudProfile '%s' in Garden cluster: %w", name, err)
 	}
 	return cloudProfile, nil
